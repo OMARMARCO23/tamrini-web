@@ -3,67 +3,91 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <meta name="theme-color" content="#6366F1">
+  <meta name="theme-color" content="#58CC02">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="description" content="Tamrini - Your AI Math Tutor that helps you learn without giving direct answers">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="description" content="Tamrini - Your fun AI Math Tutor">
   
-  <!-- PWA -->
   <link rel="manifest" href="manifest.json">
-  <link rel="apple-touch-icon" href="icons/icon-192.png">
-  
   <title>Tamrini</title>
   <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 </head>
 <body>
   
   <!-- Splash Screen -->
   <div id="splash" class="splash">
     <div class="splash-content">
-      <div class="splash-logo">📐</div>
-      <div class="splash-spinner"></div>
+      <div class="splash-mascot">📐</div>
+      <div class="splash-name">Tamrini</div>
+      <div class="splash-loader">
+        <div class="loader-bar"></div>
+      </div>
     </div>
   </div>
 
   <!-- Home Screen -->
   <div id="home-screen" class="screen">
-    <div class="home-container">
-      
-      <!-- Top Section -->
-      <div class="home-top">
-        <div class="logo-container">
-          <div class="logo-circle">
-            <span class="logo-icon">📐</span>
-          </div>
-        </div>
-        <h1 class="app-name" id="app-name">Tamrini</h1>
-        <p class="app-tagline" id="app-tagline">Your Math Tutor</p>
+    
+    <!-- Top Bar -->
+    <div class="top-bar">
+      <div class="streak-badge">
+        <span class="streak-icon">🔥</span>
+        <span class="streak-count">0</span>
       </div>
-
-      <!-- Middle Section -->
-      <div class="home-middle">
-        <div class="feature-card">
-          <div class="feature-icon">🎯</div>
-          <p class="feature-text" id="feature-text">I help you understand math by asking guiding questions — never giving direct answers!</p>
-        </div>
-      </div>
-
-      <!-- Bottom Section -->
-      <div class="home-bottom">
-        <button id="start-btn" class="primary-btn">
-          <span class="btn-icon">💬</span>
-          <span class="btn-text" id="start-text">Start Learning</span>
-        </button>
-
-        <div class="language-pills">
-          <button class="lang-pill active" data-lang="en">🇬🇧 EN</button>
-          <button class="lang-pill" data-lang="fr">🇫🇷 FR</button>
-          <button class="lang-pill" data-lang="ar">🇲🇦 AR</button>
-        </div>
-
-        <p class="version">v1.0 • Made for Students 12-18</p>
-      </div>
+      <div class="logo-small">📐 Tamrini</div>
+      <div class="settings-btn" id="settings-btn">⚙️</div>
     </div>
+
+    <!-- Main Content -->
+    <div class="home-content">
+      
+      <!-- Mascot Section -->
+      <div class="mascot-section">
+        <div class="mascot-container">
+          <div class="mascot">📐</div>
+          <div class="mascot-shadow"></div>
+        </div>
+        <div class="speech-bubble">
+          <p id="mascot-speech">Hi there! Ready to learn some math today? 🎉</p>
+          <div class="bubble-arrow"></div>
+        </div>
+      </div>
+
+      <!-- Welcome Card -->
+      <div class="welcome-card">
+        <h1 id="welcome-title">Welcome to Tamrini!</h1>
+        <p id="welcome-desc">I'll help you understand math step by step. No direct answers — just fun learning!</p>
+      </div>
+
+    </div>
+
+    <!-- Bottom Section -->
+    <div class="bottom-section">
+      
+      <!-- Start Button -->
+      <button id="start-btn" class="big-button green">
+        <span id="start-text">START LEARNING</span>
+      </button>
+
+      <!-- Language Selector -->
+      <div class="language-selector">
+        <button class="lang-btn active" data-lang="en">
+          <span class="lang-flag">🇬🇧</span>
+          <span class="lang-name">English</span>
+        </button>
+        <button class="lang-btn" data-lang="fr">
+          <span class="lang-flag">🇫🇷</span>
+          <span class="lang-name">Français</span>
+        </button>
+        <button class="lang-btn" data-lang="ar">
+          <span class="lang-flag">🇲🇦</span>
+          <span class="lang-name">العربية</span>
+        </button>
+      </div>
+
+    </div>
+
   </div>
 
   <!-- Chat Screen -->
@@ -71,66 +95,85 @@
     
     <!-- Chat Header -->
     <div class="chat-header">
-      <button id="back-btn" class="icon-btn">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M19 12H5M12 19l-7-7 7-7"/>
+      <button id="back-btn" class="back-button">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round">
+          <path d="M15 18l-6-6 6-6"/>
         </svg>
       </button>
-      <div class="header-info">
-        <div class="header-avatar">📐</div>
-        <div class="header-text">
+      <div class="chat-header-info">
+        <div class="chat-avatar">📐</div>
+        <div class="chat-header-text">
           <h2 id="chat-title">Tamrini</h2>
-          <span class="status" id="status-text">Online</span>
+          <div class="online-status">
+            <span class="online-dot"></span>
+            <span id="status-text">Online</span>
+          </div>
         </div>
       </div>
-      <button id="menu-btn" class="icon-btn">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/>
-        </svg>
-      </button>
+      <div class="header-mascot">🎯</div>
     </div>
 
-    <!-- Messages Container -->
-    <div id="messages" class="messages-container">
-      <!-- Messages will be added here -->
+    <!-- Progress Bar -->
+    <div class="progress-container">
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+      <span class="progress-text" id="progress-text">Keep going! 💪</span>
+    </div>
+
+    <!-- Messages -->
+    <div id="messages" class="messages-area">
+      <!-- Messages will appear here -->
     </div>
 
     <!-- Typing Indicator -->
-    <div id="typing" class="typing-indicator hidden">
-      <div class="typing-avatar">📐</div>
+    <div id="typing" class="typing-container hidden">
       <div class="typing-bubble">
-        <div class="typing-dots">
-          <span></span>
-          <span></span>
-          <span></span>
+        <div class="typing-avatar">📐</div>
+        <div class="typing-content">
+          <span class="typing-name">Tamrini</span>
+          <div class="typing-dots">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- Error Message -->
-    <div id="error" class="error-container hidden">
-      <span class="error-icon">⚠️</span>
-      <span id="error-text"></span>
-      <button id="error-close" class="error-close">✕</button>
+    <!-- Error -->
+    <div id="error" class="error-banner hidden">
+      <span class="error-icon">😅</span>
+      <span id="error-text">Oops! Something went wrong.</span>
+      <button id="error-close" class="error-close-btn">✕</button>
     </div>
 
-    <!-- Chat Input -->
-    <div class="chat-input-container">
-      <div class="input-wrapper">
+    <!-- Input Area -->
+    <div class="input-area">
+      <div class="input-container">
         <textarea 
           id="message-input" 
-          placeholder="Ask your math question..."
+          placeholder="Type your question..."
           rows="1"
-          id="input-placeholder"
         ></textarea>
+        <button id="send-btn" class="send-button" disabled>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+          </svg>
+        </button>
       </div>
-      <button id="send-btn" class="send-btn" disabled>
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
-        </svg>
-      </button>
+      <div class="input-hint" id="input-hint">Press Enter to send 💬</div>
     </div>
 
+  </div>
+
+  <!-- Celebration Overlay -->
+  <div id="celebration" class="celebration hidden">
+    <div class="celebration-content">
+      <div class="celebration-emoji">🎉</div>
+      <h2>Great Question!</h2>
+      <p>Let's figure this out together!</p>
+    </div>
   </div>
 
   <script src="app.js"></script>
