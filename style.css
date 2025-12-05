@@ -753,3 +753,14 @@ body {
   background: var(--border);
   border-radius: 4px;
 }
+/* Fix message text display */
+.message-text {
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+}
+
+.message-bubble {
+  max-width: 85%;
+  word-wrap: break-word;
+}
