@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Tamrini - Math Tutor</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Home Screen -->
+  <div id="home-screen" class="screen active">
+    <div class="language-selector">
+      <button id="lang-btn" class="lang-btn">🇬🇧 English</button>
+      <div id="lang-dropdown" class="lang-dropdown hidden">
+        <button data-lang="en">🇬🇧 English</button>
+        <button data-lang="fr">🇫🇷 Français</button>
+        <button data-lang="ar">🇲🇦 العربية</button>
+      </div>
+    </div>
+
+    <div class="home-content">
+      <div class="logo">📐</div>
+      <h1 id="app-title">Tamrini</h1>
+      <p id="app-tagline" class="tagline">Your Math Tutor</p>
+      
+      <div class="topics">
+        <span class="topic">➕ Algebra</span>
+        <span class="topic">📊 Geometry</span>
+        <span class="topic">📈 Calculus</span>
+      </div>
+
+      <button id="start-btn" class="start-btn">Start Learning</button>
+    </div>
+  </div>
+
+  <!-- Chat Screen -->
+  <div id="chat-screen" class="screen">
+    <div class="chat-header">
+      <button id="back-btn" class="back-btn">←</button>
+      <h2>📐 <span id="chat-title">Tamrini</span></h2>
+      <div style="width: 40px;"></div>
+    </div>
+
+    <div id="messages" class="messages"></div>
+
+    <div id="loading" class="loading hidden">
+      <div class="spinner"></div>
+      <span id="loading-text">Thinking...</span>
+    </div>
+
+    <div id="error" class="error hidden"></div>
+
+    <div class="input-container">
+      <textarea 
+        id="message-input" 
+        placeholder="Type your math question..."
+        rows="1"
+      ></textarea>
+      <button id="send-btn" class="send-btn" disabled>➤</button>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
