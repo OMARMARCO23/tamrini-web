@@ -1,15 +1,15 @@
 {
   "name": "Tamrini",
   "short_name": "Tamrini",
-  "description": "Your AI Math Tutor",
+  "description": "Your fun AI Math Tutor",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0F172A",
-  "theme_color": "#6366F1",
+  "background_color": "#FFFFFF",
+  "theme_color": "#58CC02",
   "orientation": "portrait",
   "icons": [
     {
-      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📐</text></svg>",
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%2358CC02' width='100' height='100' rx='20'/><text x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-size='60'>📐</text></svg>",
       "sizes": "any",
       "type": "image/svg+xml"
     }
