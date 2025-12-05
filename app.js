@@ -2,39 +2,45 @@
 const translations = {
   en: {
     appName: "Tamrini",
-    tagline: "Your Math Tutor",
-    feature: "I help you understand math by asking guiding questions — never giving direct answers!",
-    startBtn: "Start Learning",
-    placeholder: "Ask your math question...",
-    welcome: "Hello! 👋 I'm Tamrini, your math tutor.\n\nI won't give you direct answers, but I'll help you think through problems step by step.\n\nWhat are you working on today?",
-    thinking: "Thinking...",
+    welcome: "Welcome to Tamrini!",
+    welcomeDesc: "I'll help you understand math step by step. No direct answers — just fun learning!",
+    mascotSpeech: "Hi there! Ready to learn some math today? 🎉",
+    startBtn: "START LEARNING",
+    placeholder: "Type your question...",
+    inputHint: "Press Enter to send 💬",
+    greeting: "Hey there! 👋 I'm Tamrini, your math buddy!\n\nI won't just give you answers — that's no fun! Instead, I'll help you figure things out step by step.\n\nSo, what math problem are you working on? 🧮",
     online: "Online",
-    error: "Oops! Something went wrong. Please try again.",
-    quotaError: "Too many requests! Please wait a moment.",
+    progress: "Keep going! 💪",
+    error: "Oops! Let's try that again 😅",
+    quotaError: "Whoa! Too fast! Take a breath and try again 🧘",
   },
   fr: {
     appName: "Tamrini",
-    tagline: "Ton Tuteur de Maths",
-    feature: "Je t'aide à comprendre les maths en posant des questions guidées — jamais de réponses directes!",
-    startBtn: "Commencer",
-    placeholder: "Pose ta question de maths...",
-    welcome: "Salut! 👋 Je suis Tamrini, ton tuteur de maths.\n\nJe ne te donnerai pas les réponses directement, mais je t'aiderai à réfléchir étape par étape.\n\nSur quoi travailles-tu aujourd'hui?",
-    thinking: "Je réfléchis...",
+    welcome: "Bienvenue sur Tamrini!",
+    welcomeDesc: "Je t'aide à comprendre les maths étape par étape. Pas de réponses directes — juste du fun!",
+    mascotSpeech: "Salut! Prêt à apprendre des maths aujourd'hui? 🎉",
+    startBtn: "COMMENCER",
+    placeholder: "Écris ta question...",
+    inputHint: "Appuie sur Entrée pour envoyer 💬",
+    greeting: "Salut! 👋 Je suis Tamrini, ton ami des maths!\n\nJe ne vais pas te donner les réponses directement — c'est pas marrant! Je vais t'aider à comprendre étape par étape.\n\nAlors, sur quel problème tu travailles? 🧮",
     online: "En ligne",
-    error: "Oups! Une erreur s'est produite. Réessaie.",
-    quotaError: "Trop de demandes! Attends un moment.",
+    progress: "Continue! 💪",
+    error: "Oups! Réessayons 😅",
+    quotaError: "Doucement! Trop rapide! Respire et réessaie 🧘",
   },
   ar: {
     appName: "تمريني",
-    tagline: "معلمك في الرياضيات",
-    feature: "أساعدك على فهم الرياضيات من خلال طرح أسئلة توجيهية - لن أعطيك الإجابات مباشرة!",
+    welcome: "مرحباً بك في تمريني!",
+    welcomeDesc: "سأساعدك على فهم الرياضيات خطوة بخطوة. لا إجابات مباشرة — فقط تعلم ممتع!",
+    mascotSpeech: "مرحباً! هل أنت مستعد لتعلم الرياضيات اليوم؟ 🎉",
     startBtn: "ابدأ التعلم",
-    placeholder: "اكتب سؤالك في الرياضيات...",
-    welcome: "مرحباً! 👋 أنا تمريني، معلمك في الرياضيات.\n\nلن أعطيك الإجابات مباشرة، لكنني سأساعدك على التفكير خطوة بخطوة.\n\nما الذي تعمل عليه اليوم؟",
-    thinking: "أفكر...",
+    placeholder: "اكتب سؤالك...",
+    inputHint: "اضغط Enter للإرسال 💬",
+    greeting: "مرحباً! 👋 أنا تمريني، صديقك في الرياضيات!\n\nلن أعطيك الإجابات مباشرة — هذا ليس ممتعاً! سأساعدك على الفهم خطوة بخطوة.\n\nإذن، ما المسألة التي تعمل عليها؟ 🧮",
     online: "متصل",
-    error: "عذراً! حدث خطأ. حاول مرة أخرى.",
-    quotaError: "طلبات كثيرة! انتظر قليلاً.",
+    progress: "استمر! 💪",
+    error: "عذراً! لنحاول مرة أخرى 😅",
+    quotaError: "مهلاً! بطّئ قليلاً! خذ نفساً وحاول مجدداً 🧘",
   }
 };
 
@@ -42,32 +48,20 @@ const translations = {
 let currentLang = localStorage.getItem('tamrini_lang') || 'en';
 let messages = [];
 let isLoading = false;
+let messageCount = 0;
 
 const API_URL = 'https://tamarini-app.vercel.app/api/chat';
 
 // ===== ELEMENTS =====
 const $ = id => document.getElementById(id);
-const splash = $('splash');
-const homeScreen = $('home-screen');
-const chatScreen = $('chat-screen');
-const startBtn = $('start-btn');
-const backBtn = $('back-btn');
-const messagesContainer = $('messages');
-const messageInput = $('message-input');
-const sendBtn = $('send-btn');
-const typingIndicator = $('typing');
-const errorContainer = $('error');
-const errorText = $('error-text');
-const errorClose = $('error-close');
-const langPills = document.querySelectorAll('.lang-pill');
 
 // ===== INIT =====
 function init() {
-  // Hide splash after load
+  // Hide splash
   setTimeout(() => {
-    splash.classList.add('hidden');
-    homeScreen.classList.add('active');
-  }, 1500);
+    $('splash').classList.add('hidden');
+    $('home-screen').classList.add('active');
+  }, 2000);
 
   updateLanguage(currentLang);
   setupEventListeners();
@@ -80,18 +74,20 @@ function updateLanguage(lang) {
   
   const t = translations[lang];
   
-  // Update UI
-  $('app-name').textContent = t.appName;
-  $('app-tagline').textContent = t.tagline;
-  $('feature-text').textContent = t.feature;
+  // Update text
+  $('welcome-title').textContent = t.welcome;
+  $('welcome-desc').textContent = t.welcomeDesc;
+  $('mascot-speech').textContent = t.mascotSpeech;
   $('start-text').textContent = t.startBtn;
   $('chat-title').textContent = t.appName;
   $('status-text').textContent = t.online;
-  messageInput.placeholder = t.placeholder;
+  $('message-input').placeholder = t.placeholder;
+  $('input-hint').textContent = t.inputHint;
+  $('progress-text').textContent = t.progress;
   
-  // Update pills
-  langPills.forEach(pill => {
-    pill.classList.toggle('active', pill.dataset.lang === lang);
+  // Update lang buttons
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.lang === lang);
   });
   
   // RTL
@@ -100,39 +96,42 @@ function updateLanguage(lang) {
 
 // ===== EVENT LISTENERS =====
 function setupEventListeners() {
-  // Language pills
-  langPills.forEach(pill => {
-    pill.addEventListener('click', () => updateLanguage(pill.dataset.lang));
+  // Language buttons
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.addEventListener('click', () => updateLanguage(btn.dataset.lang));
   });
 
-  // Start chat
-  startBtn.addEventListener('click', () => {
-    homeScreen.classList.remove('active');
-    chatScreen.classList.add('active');
+  // Start button
+  $('start-btn').addEventListener('click', () => {
+    $('home-screen').classList.remove('active');
+    $('chat-screen').classList.add('active');
     
     if (messages.length === 0) {
-      addMessage('bot', translations[currentLang].welcome);
+      addMessage('bot', translations[currentLang].greeting);
     }
     
-    messageInput.focus();
+    $('message-input').focus();
   });
 
   // Back button
-  backBtn.addEventListener('click', () => {
-    chatScreen.classList.remove('active');
-    homeScreen.classList.add('active');
+  $('back-btn').addEventListener('click', () => {
+    $('chat-screen').classList.remove('active');
+    $('home-screen').classList.add('active');
   });
 
   // Input
-  messageInput.addEventListener('input', () => {
-    sendBtn.disabled = !messageInput.value.trim() || isLoading;
-    autoResize();
+  const input = $('message-input');
+  const sendBtn = $('send-btn');
+  
+  input.addEventListener('input', () => {
+    sendBtn.disabled = !input.value.trim() || isLoading;
+    autoResize(input);
   });
 
   // Send
   sendBtn.addEventListener('click', sendMessage);
   
-  messageInput.addEventListener('keydown', (e) => {
+  input.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       sendMessage();
@@ -140,15 +139,15 @@ function setupEventListeners() {
   });
 
   // Error close
-  errorClose.addEventListener('click', () => {
-    errorContainer.classList.add('hidden');
+  $('error-close').addEventListener('click', () => {
+    $('error').classList.add('hidden');
   });
 }
 
-// ===== AUTO RESIZE TEXTAREA =====
-function autoResize() {
-  messageInput.style.height = 'auto';
-  messageInput.style.height = Math.min(messageInput.scrollHeight, 120) + 'px';
+// ===== AUTO RESIZE =====
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 100) + 'px';
 }
 
 // ===== ADD MESSAGE =====
@@ -156,32 +155,29 @@ function addMessage(role, content) {
   messages.push({ role, content });
   
   const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const name = role === 'bot' ? 'Tamrini' : 'You';
+  const avatar = role === 'bot' ? '📐' : '😊';
   
   const messageDiv = document.createElement('div');
   messageDiv.className = `message ${role === 'user' ? 'user' : 'bot'}`;
   
-  if (role === 'bot') {
-    messageDiv.innerHTML = `
-      <div class="message-bubble">
-        <div class="message-header">
-          <span class="message-avatar">📐</span>
-          <span class="message-name">Tamrini</span>
-        </div>
-        <div class="message-content">${formatMessage(content)}</div>
-        <div class="message-time">${time}</div>
-      </div>
-    `;
-  } else {
-    messageDiv.innerHTML = `
-      <div class="message-bubble">
-        <div class="message-content">${formatMessage(content)}</div>
-        <div class="message-time">${time}</div>
-      </div>
-    `;
-  }
+  messageDiv.innerHTML = `
+    <div class="message-avatar">${avatar}</div>
+    <div class="message-content">
+      <div class="message-name">${name}</div>
+      <div class="message-text">${formatMessage(content)}</div>
+      <div class="message-time">${time}</div>
+    </div>
+  `;
   
-  messagesContainer.appendChild(messageDiv);
+  $('messages').appendChild(messageDiv);
   scrollToBottom();
+  
+  // Update progress
+  if (role === 'user') {
+    messageCount++;
+    updateProgress();
+  }
 }
 
 // ===== FORMAT MESSAGE =====
@@ -192,26 +188,39 @@ function formatMessage(text) {
     .replace(/\*(.*?)\*/g, '<em>$1</em>');
 }
 
-// ===== SCROLL TO BOTTOM =====
+// ===== UPDATE PROGRESS =====
+function updateProgress() {
+  const progress = Math.min(messageCount * 10, 100);
+  $('progress-fill').style.width = progress + '%';
+  
+  const messages = ['Keep going! 💪', 'Great job! 🌟', 'You\'re doing amazing! 🚀', 'Math champion! 🏆'];
+  const index = Math.min(Math.floor(messageCount / 3), messages.length - 1);
+  $('progress-text').textContent = messages[index];
+}
+
+// ===== SCROLL =====
 function scrollToBottom() {
-  messagesContainer.scrollTop = messagesContainer.scrollHeight;
+  const container = $('messages');
+  container.scrollTop = container.scrollHeight;
 }
 
 // ===== SEND MESSAGE =====
 async function sendMessage() {
-  const text = messageInput.value.trim();
+  const input = $('message-input');
+  const text = input.value.trim();
+  
   if (!text || isLoading) return;
 
   // Add user message
   addMessage('user', text);
-  messageInput.value = '';
-  messageInput.style.height = 'auto';
-  sendBtn.disabled = true;
+  input.value = '';
+  input.style.height = 'auto';
+  $('send-btn').disabled = true;
 
   // Show typing
   isLoading = true;
-  typingIndicator.classList.remove('hidden');
-  errorContainer.classList.add('hidden');
+  $('typing').classList.remove('hidden');
+  $('error').classList.add('hidden');
   scrollToBottom();
 
   try {
@@ -236,16 +245,31 @@ async function sendMessage() {
       throw new Error(data.details?.includes('quota') ? 'QUOTA' : 'ERROR');
     }
 
+    // Show celebration on first message
+    if (messageCount === 1) {
+      showCelebration();
+    }
+
     addMessage('bot', data.reply);
 
   } catch (error) {
     const t = translations[currentLang];
-    errorText.textContent = error.message === 'QUOTA' ? t.quotaError : t.error;
-    errorContainer.classList.remove('hidden');
+    $('error-text').textContent = error.message === 'QUOTA' ? t.quotaError : t.error;
+    $('error').classList.remove('hidden');
   }
 
   isLoading = false;
-  typingIndicator.classList.add('hidden');
+  $('typing').classList.add('hidden');
+}
+
+// ===== CELEBRATION =====
+function showCelebration() {
+  const celebration = $('celebration');
+  celebration.classList.remove('hidden');
+  
+  setTimeout(() => {
+    celebration.classList.add('hidden');
+  }, 2000);
 }
 
 // ===== START =====
