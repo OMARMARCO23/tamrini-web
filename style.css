@@ -753,7 +753,8 @@ body {
   background: var(--border);
   border-radius: 4px;
 }
-/* Fix message text display */
+
+/* Fix message display */
 .message-text {
   word-wrap: break-word;
   white-space: pre-wrap;
