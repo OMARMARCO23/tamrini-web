@@ -273,24 +273,29 @@ window.onload = function() {
   }
   
   // ===== CREATE MESSAGE ELEMENT =====
-  function createMessageEl(msg) {
-    var div = document.createElement('div');
-    div.className = 'message ' + (msg.role === 'user' ? 'user' : 'bot');
-    
-    var avatar = msg.role === 'user' ? '👤' : '📐';
-    var time = msg.time || '';
-    
-    var text = msg.content || '';
-    text = text.replace(/\n/g, '<br>');
-    
-    div.innerHTML = '<div class="message-avatar">' + avatar + '</div>' +
-      '<div class="message-bubble">' +
-      '<div class="message-text">' + text + '</div>' +
-      '<div class="message-time">' + time + '</div>' +
-      '</div>';
-    
-    return div;
-  }
+function createMessageEl(msg) {
+  var div = document.createElement('div');
+  div.className = 'message ' + (msg.role === 'user' ? 'user' : 'bot');
+  
+  var avatar = msg.role === 'user' ? '👤' : '📐';
+  var time = msg.time || '';
+  
+  var text = msg.content || '';
+  // Convert newlines to <br> and handle special characters
+  text = text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/\n/g, '<br>');
+  
+  div.innerHTML = '<div class="message-avatar">' + avatar + '</div>' +
+    '<div class="message-bubble">' +
+    '<div class="message-text">' + text + '</div>' +
+    '<div class="message-time">' + time + '</div>' +
+    '</div>';
+  
+  return div;
+}
   
   // ===== ADD MESSAGE =====
   function addMessage(role, content) {
