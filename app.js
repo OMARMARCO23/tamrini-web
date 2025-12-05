@@ -1,93 +1,215 @@
 // ===== TRANSLATIONS =====
 const translations = {
   en: {
-    appName: "Tamrini",
-    welcome: "Welcome to Tamrini!",
-    welcomeDesc: "I'll help you understand math step by step. No direct answers — just fun learning!",
-    mascotSpeech: "Hi there! Ready to learn some math today? 🎉",
-    startBtn: "START LEARNING",
-    placeholder: "Type your question...",
-    inputHint: "Press Enter to send 💬",
-    greeting: "Hey there! 👋 I'm Tamrini, your math buddy!\n\nI won't just give you answers — that's no fun! Instead, I'll help you figure things out step by step.\n\nSo, what math problem are you working on? 🧮",
-    online: "Online",
-    progress: "Keep going! 💪",
-    error: "Oops! Let's try that again 😅",
-    quotaError: "Whoa! Too fast! Take a breath and try again 🧘",
+    tagline: "Math Tutor",
+    newExercise: "New Exercise",
+    emptyTitle: "Ready to Learn?",
+    emptyDesc: "Click \"New Exercise\" or type your math question below",
+    placeholder: "Type your math question...",
+    thinking: "Thinking...",
+    error: "Something went wrong. Please try again.",
+    quotaError: "Too many requests. Please wait a moment.",
+    navHome: "Home",
+    navHistory: "History",
+    navSettings: "Settings",
+    navAbout: "About",
+    settingsTitle: "Settings",
+    langSection: "Language",
+    clearSection: "Data",
+    clearChat: "Clear Chat History",
+    aboutTitle: "About",
+    whatIs: "What is Tamrini?",
+    whatIsDesc: "Tamrini is an AI-powered math tutor designed for students aged 12-18. Instead of giving direct answers, Tamrini guides you through problems step by step, helping you truly understand mathematics.",
+    howWorks: "How it Works",
+    subjects: "Subjects Covered",
+    historyTitle: "History",
+    historyEmpty: "No History Yet",
+    historyEmptyDesc: "Your solved exercises will appear here",
+    greeting: "Hello! 👋 I'm Tamrini, your math tutor.\n\nTell me what exercise you're working on, and I'll help you solve it step by step.",
+    newExerciseGreeting: "Great! Let's start a new exercise. 📝\n\nWhat math problem would you like to work on?"
   },
   fr: {
-    appName: "Tamrini",
-    welcome: "Bienvenue sur Tamrini!",
-    welcomeDesc: "Je t'aide à comprendre les maths étape par étape. Pas de réponses directes — juste du fun!",
-    mascotSpeech: "Salut! Prêt à apprendre des maths aujourd'hui? 🎉",
-    startBtn: "COMMENCER",
-    placeholder: "Écris ta question...",
-    inputHint: "Appuie sur Entrée pour envoyer 💬",
-    greeting: "Salut! 👋 Je suis Tamrini, ton ami des maths!\n\nJe ne vais pas te donner les réponses directement — c'est pas marrant! Je vais t'aider à comprendre étape par étape.\n\nAlors, sur quel problème tu travailles? 🧮",
-    online: "En ligne",
-    progress: "Continue! 💪",
-    error: "Oups! Réessayons 😅",
-    quotaError: "Doucement! Trop rapide! Respire et réessaie 🧘",
+    tagline: "Tuteur de Maths",
+    newExercise: "Nouvel Exercice",
+    emptyTitle: "Prêt à Apprendre?",
+    emptyDesc: "Clique sur \"Nouvel Exercice\" ou tape ta question ci-dessous",
+    placeholder: "Écris ta question de maths...",
+    thinking: "Je réfléchis...",
+    error: "Une erreur s'est produite. Réessaie.",
+    quotaError: "Trop de demandes. Attends un moment.",
+    navHome: "Accueil",
+    navHistory: "Historique",
+    navSettings: "Paramètres",
+    navAbout: "À propos",
+    settingsTitle: "Paramètres",
+    langSection: "Langue",
+    clearSection: "Données",
+    clearChat: "Effacer l'historique",
+    aboutTitle: "À propos",
+    whatIs: "Qu'est-ce que Tamrini?",
+    whatIsDesc: "Tamrini est un tuteur de maths alimenté par l'IA, conçu pour les élèves de 12 à 18 ans. Au lieu de donner des réponses directes, Tamrini te guide pas à pas pour vraiment comprendre les mathématiques.",
+    howWorks: "Comment ça marche",
+    subjects: "Matières couvertes",
+    historyTitle: "Historique",
+    historyEmpty: "Pas encore d'historique",
+    historyEmptyDesc: "Tes exercices résolus apparaîtront ici",
+    greeting: "Bonjour! 👋 Je suis Tamrini, ton tuteur de maths.\n\nDis-moi sur quel exercice tu travailles, et je t'aiderai à le résoudre étape par étape.",
+    newExerciseGreeting: "Super! Commençons un nouvel exercice. 📝\n\nQuel problème de maths veux-tu résoudre?"
   },
   ar: {
-    appName: "تمريني",
-    welcome: "مرحباً بك في تمريني!",
-    welcomeDesc: "سأساعدك على فهم الرياضيات خطوة بخطوة. لا إجابات مباشرة — فقط تعلم ممتع!",
-    mascotSpeech: "مرحباً! هل أنت مستعد لتعلم الرياضيات اليوم؟ 🎉",
-    startBtn: "ابدأ التعلم",
-    placeholder: "اكتب سؤالك...",
-    inputHint: "اضغط Enter للإرسال 💬",
-    greeting: "مرحباً! 👋 أنا تمريني، صديقك في الرياضيات!\n\nلن أعطيك الإجابات مباشرة — هذا ليس ممتعاً! سأساعدك على الفهم خطوة بخطوة.\n\nإذن، ما المسألة التي تعمل عليها؟ 🧮",
-    online: "متصل",
-    progress: "استمر! 💪",
-    error: "عذراً! لنحاول مرة أخرى 😅",
-    quotaError: "مهلاً! بطّئ قليلاً! خذ نفساً وحاول مجدداً 🧘",
+    tagline: "معلم الرياضيات",
+    newExercise: "تمرين جديد",
+    emptyTitle: "مستعد للتعلم؟",
+    emptyDesc: "انقر على \"تمرين جديد\" أو اكتب سؤالك أدناه",
+    placeholder: "اكتب سؤالك في الرياضيات...",
+    thinking: "أفكر...",
+    error: "حدث خطأ. حاول مرة أخرى.",
+    quotaError: "طلبات كثيرة. انتظر قليلاً.",
+    navHome: "الرئيسية",
+    navHistory: "السجل",
+    navSettings: "الإعدادات",
+    navAbout: "حول",
+    settingsTitle: "الإعدادات",
+    langSection: "اللغة",
+    clearSection: "البيانات",
+    clearChat: "مسح المحادثات",
+    aboutTitle: "حول التطبيق",
+    whatIs: "ما هو تمريني؟",
+    whatIsDesc: "تمريني هو معلم رياضيات ذكي مصمم للطلاب من 12 إلى 18 سنة. بدلاً من إعطاء الإجابات مباشرة، يرشدك تمريني خطوة بخطوة لفهم الرياضيات حقاً.",
+    howWorks: "كيف يعمل",
+    subjects: "المواد المتاحة",
+    historyTitle: "السجل",
+    historyEmpty: "لا يوجد سجل بعد",
+    historyEmptyDesc: "ستظهر تمارينك المحلولة هنا",
+    greeting: "مرحباً! 👋 أنا تمريني، معلمك في الرياضيات.\n\nأخبرني ما هو التمرين الذي تعمل عليه، وسأساعدك على حله خطوة بخطوة.",
+    newExerciseGreeting: "ممتاز! لنبدأ تمريناً جديداً. 📝\n\nما هي المسألة التي تريد حلها؟"
   }
 };
 
 // ===== STATE =====
 let currentLang = localStorage.getItem('tamrini_lang') || 'en';
-let messages = [];
+let messages = JSON.parse(localStorage.getItem('tamrini_messages') || '[]');
+let history = JSON.parse(localStorage.getItem('tamrini_history') || '[]');
 let isLoading = false;
-let messageCount = 0;
 
 const API_URL = 'https://tamarini-app.vercel.app/api/chat';
 
 // ===== ELEMENTS =====
 const $ = id => document.getElementById(id);
 
-// ===== INIT =====
-function init() {
-  // Hide splash
-  setTimeout(() => {
-    $('splash').classList.add('hidden');
-    $('home-screen').classList.add('active');
-  }, 2000);
+// ===== PROFESSIONAL PROMPT =====
+function getSystemPrompt(lang) {
+  const prompts = {
+    en: `You are Tamrini, a professional math tutor for students aged 12-18.
 
-  updateLanguage(currentLang);
-  setupEventListeners();
+IMPORTANT RULES:
+1. NEVER give the direct answer immediately
+2. Guide the student with clear, focused questions
+3. Break down problems into small, manageable steps
+4. When student is stuck, give ONE small hint at a time
+5. Keep responses SHORT and CLEAR (2-4 sentences max)
+6. Use simple language appropriate for the student's level
+7. Be encouraging but not excessive
+8. If the student's answer is wrong, gently redirect without discouraging
+9. When the student solves it correctly, briefly congratulate and summarize what they learned
+
+RESPONSE FORMAT:
+- Start with acknowledging their question/answer
+- Ask ONE guiding question OR give ONE hint
+- Keep it brief and focused
+
+Respond in English.`,
+
+    fr: `Tu es Tamrini, un tuteur de maths professionnel pour les élèves de 12 à 18 ans.
+
+RÈGLES IMPORTANTES:
+1. Ne JAMAIS donner la réponse directement
+2. Guide l'élève avec des questions claires et ciblées
+3. Décompose les problèmes en petites étapes
+4. Si l'élève bloque, donne UN indice à la fois
+5. Garde les réponses COURTES et CLAIRES (2-4 phrases max)
+6. Utilise un langage simple adapté au niveau de l'élève
+7. Sois encourageant mais pas excessif
+8. Si la réponse est fausse, redirige gentiment sans décourager
+9. Quand l'élève réussit, félicite brièvement et résume ce qu'il a appris
+
+FORMAT DE RÉPONSE:
+- Commence par reconnaître la question/réponse
+- Pose UNE question guidée OU donne UN indice
+- Reste bref et concentré
+
+Réponds en français.`,
+
+    ar: `أنت تمريني، معلم رياضيات محترف للطلاب من 12 إلى 18 سنة.
+
+القواعد المهمة:
+1. لا تعطي الإجابة المباشرة أبداً
+2. وجّه الطالب بأسئلة واضحة ومركزة
+3. قسّم المسائل إلى خطوات صغيرة
+4. إذا توقف الطالب، أعطِ تلميحاً واحداً فقط
+5. اجعل الردود قصيرة وواضحة (2-4 جمل كحد أقصى)
+6. استخدم لغة بسيطة مناسبة لمستوى الطالب
+7. كن مشجعاً لكن بدون مبالغة
+8. إذا كانت الإجابة خاطئة، صحح بلطف دون إحباط
+9. عندما ينجح الطالب، هنئه باختصار ولخص ما تعلمه
+
+صيغة الرد:
+- ابدأ بالاعتراف بالسؤال/الإجابة
+- اطرح سؤالاً توجيهياً واحداً أو أعطِ تلميحاً واحداً
+- كن موجزاً ومركزاً
+
+أجب بالعربية.`
+  };
+  
+  return prompts[lang] || prompts.en;
 }
 
-// ===== LANGUAGE =====
+// ===== INIT =====
+function init() {
+  updateLanguage(currentLang);
+  setupEventListeners();
+  renderMessages();
+  renderHistory();
+}
+
+// ===== UPDATE LANGUAGE =====
 function updateLanguage(lang) {
   currentLang = lang;
   localStorage.setItem('tamrini_lang', lang);
   
   const t = translations[lang];
   
-  // Update text
-  $('welcome-title').textContent = t.welcome;
-  $('welcome-desc').textContent = t.welcomeDesc;
-  $('mascot-speech').textContent = t.mascotSpeech;
-  $('start-text').textContent = t.startBtn;
-  $('chat-title').textContent = t.appName;
-  $('status-text').textContent = t.online;
+  // Update all text elements
+  $('tagline').textContent = t.tagline;
+  $('new-exercise-text').textContent = t.newExercise;
+  $('empty-title').textContent = t.emptyTitle;
+  $('empty-desc').textContent = t.emptyDesc;
   $('message-input').placeholder = t.placeholder;
-  $('input-hint').textContent = t.inputHint;
-  $('progress-text').textContent = t.progress;
+  $('typing-text').textContent = t.thinking;
+  $('nav-home').textContent = t.navHome;
+  $('nav-history').textContent = t.navHistory;
+  $('nav-settings').textContent = t.navSettings;
+  $('nav-about').textContent = t.navAbout;
+  $('settings-title').textContent = t.settingsTitle;
+  $('lang-section-title').textContent = t.langSection;
+  $('clear-section-title').textContent = t.clearSection;
+  $('clear-chat-text').textContent = t.clearChat;
+  $('about-title').textContent = t.aboutTitle;
+  $('what-is-title').textContent = t.whatIs;
+  $('what-is-desc').textContent = t.whatIsDesc;
+  $('how-works-title').textContent = t.howWorks;
+  $('subjects-title').textContent = t.subjects;
+  $('history-title').textContent = t.historyTitle;
+  $('history-empty-title').textContent = t.historyEmpty;
+  $('history-empty-desc').textContent = t.historyEmptyDesc;
   
-  // Update lang buttons
+  // Update active states
   document.querySelectorAll('.lang-btn').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.lang === lang);
+  });
+  
+  document.querySelectorAll('.option-check').forEach(check => {
+    check.classList.toggle('active', check.dataset.check === lang);
   });
   
   // RTL
@@ -96,29 +218,50 @@ function updateLanguage(lang) {
 
 // ===== EVENT LISTENERS =====
 function setupEventListeners() {
-  // Language buttons
+  // Header language buttons
   document.querySelectorAll('.lang-btn').forEach(btn => {
     btn.addEventListener('click', () => updateLanguage(btn.dataset.lang));
   });
-
-  // Start button
-  $('start-btn').addEventListener('click', () => {
-    $('home-screen').classList.remove('active');
-    $('chat-screen').classList.add('active');
-    
-    if (messages.length === 0) {
-      addMessage('bot', translations[currentLang].greeting);
-    }
-    
+  
+  // Settings language options
+  document.querySelectorAll('.setting-option[data-lang]').forEach(btn => {
+    btn.addEventListener('click', () => updateLanguage(btn.dataset.lang));
+  });
+  
+  // Navigation
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', () => {
+      const page = item.dataset.page;
+      
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      
+      $(`page-${page}`).classList.add('active');
+      item.classList.add('active');
+    });
+  });
+  
+  // New Exercise
+  $('new-exercise-btn').addEventListener('click', () => {
+    messages = [];
+    localStorage.setItem('tamrini_messages', '[]');
+    renderMessages();
+    addMessage('bot', translations[currentLang].newExerciseGreeting);
     $('message-input').focus();
   });
-
-  // Back button
-  $('back-btn').addEventListener('click', () => {
-    $('chat-screen').classList.remove('active');
-    $('home-screen').classList.add('active');
+  
+  // Clear chat
+  $('clear-chat-btn').addEventListener('click', () => {
+    if (confirm('Are you sure you want to clear chat history?')) {
+      messages = [];
+      history = [];
+      localStorage.setItem('tamrini_messages', '[]');
+      localStorage.setItem('tamrini_history', '[]');
+      renderMessages();
+      renderHistory();
+    }
   });
-
+  
   // Input
   const input = $('message-input');
   const sendBtn = $('send-btn');
@@ -127,8 +270,7 @@ function setupEventListeners() {
     sendBtn.disabled = !input.value.trim() || isLoading;
     autoResize(input);
   });
-
-  // Send
+  
   sendBtn.addEventListener('click', sendMessage);
   
   input.addEventListener('keydown', (e) => {
@@ -137,7 +279,7 @@ function setupEventListeners() {
       sendMessage();
     }
   });
-
+  
   // Error close
   $('error-close').addEventListener('click', () => {
     $('error').classList.add('hidden');
@@ -150,127 +292,24 @@ function autoResize(el) {
   el.style.height = Math.min(el.scrollHeight, 100) + 'px';
 }
 
-// ===== ADD MESSAGE =====
-function addMessage(role, content) {
-  messages.push({ role, content });
-  
-  const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  const name = role === 'bot' ? 'Tamrini' : 'You';
-  const avatar = role === 'bot' ? '📐' : '😊';
-  
-  const messageDiv = document.createElement('div');
-  messageDiv.className = `message ${role === 'user' ? 'user' : 'bot'}`;
-  
-  messageDiv.innerHTML = `
-    <div class="message-avatar">${avatar}</div>
-    <div class="message-content">
-      <div class="message-name">${name}</div>
-      <div class="message-text">${formatMessage(content)}</div>
-      <div class="message-time">${time}</div>
-    </div>
-  `;
-  
-  $('messages').appendChild(messageDiv);
-  scrollToBottom();
-  
-  // Update progress
-  if (role === 'user') {
-    messageCount++;
-    updateProgress();
-  }
-}
-
-// ===== FORMAT MESSAGE =====
-function formatMessage(text) {
-  return text
-    .replace(/\n/g, '<br>')
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.*?)\*/g, '<em>$1</em>');
-}
-
-// ===== UPDATE PROGRESS =====
-function updateProgress() {
-  const progress = Math.min(messageCount * 10, 100);
-  $('progress-fill').style.width = progress + '%';
-  
-  const messages = ['Keep going! 💪', 'Great job! 🌟', 'You\'re doing amazing! 🚀', 'Math champion! 🏆'];
-  const index = Math.min(Math.floor(messageCount / 3), messages.length - 1);
-  $('progress-text').textContent = messages[index];
-}
-
-// ===== SCROLL =====
-function scrollToBottom() {
+// ===== RENDER MESSAGES =====
+function renderMessages() {
   const container = $('messages');
-  container.scrollTop = container.scrollHeight;
-}
-
-// ===== SEND MESSAGE =====
-async function sendMessage() {
-  const input = $('message-input');
-  const text = input.value.trim();
+  const emptyState = $('empty-state');
   
-  if (!text || isLoading) return;
-
-  // Add user message
-  addMessage('user', text);
-  input.value = '';
-  input.style.height = 'auto';
-  $('send-btn').disabled = true;
-
-  // Show typing
-  isLoading = true;
-  $('typing').classList.remove('hidden');
-  $('error').classList.add('hidden');
-  scrollToBottom();
-
-  try {
-    const history = messages.slice(-10).map(m => ({
-      role: m.role === 'bot' ? 'assistant' : m.role,
-      content: m.content
-    }));
-
-    const response = await fetch(API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        question: text,
-        language: currentLang,
-        history
-      })
+  container.innerHTML = '';
+  
+  if (messages.length === 0) {
+    emptyState.classList.remove('hidden');
+  } else {
+    emptyState.classList.add('hidden');
+    messages.forEach(msg => {
+      container.appendChild(createMessageElement(msg));
     });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.details?.includes('quota') ? 'QUOTA' : 'ERROR');
-    }
-
-    // Show celebration on first message
-    if (messageCount === 1) {
-      showCelebration();
-    }
-
-    addMessage('bot', data.reply);
-
-  } catch (error) {
-    const t = translations[currentLang];
-    $('error-text').textContent = error.message === 'QUOTA' ? t.quotaError : t.error;
-    $('error').classList.remove('hidden');
+    scrollToBottom();
   }
-
-  isLoading = false;
-  $('typing').classList.add('hidden');
 }
 
-// ===== CELEBRATION =====
-function showCelebration() {
-  const celebration = $('celebration');
-  celebration.classList.remove('hidden');
-  
-  setTimeout(() => {
-    celebration.classList.add('hidden');
-  }, 2000);
-}
-
-// ===== START =====
-document.addEventListener('DOMContentLoaded', init);
+// ===== CREATE MESSAGE ELEMENT =====
+function createMessageElement(msg) {
+  const 
