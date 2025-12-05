@@ -1,141 +1,135 @@
-// Translations
+// ===== TRANSLATIONS =====
 const translations = {
   en: {
     appName: "Tamrini",
     tagline: "Your Math Tutor",
-    startChat: "Start Learning",
-    typeMessage: "Type your math question...",
-    welcome: "Hello! 👋 I'm Tamrini, your math tutor. What problem are you working on today?",
+    feature: "I help you understand math by asking guiding questions — never giving direct answers!",
+    startBtn: "Start Learning",
+    placeholder: "Ask your math question...",
+    welcome: "Hello! 👋 I'm Tamrini, your math tutor.\n\nI won't give you direct answers, but I'll help you think through problems step by step.\n\nWhat are you working on today?",
     thinking: "Thinking...",
+    online: "Online",
     error: "Oops! Something went wrong. Please try again.",
-    quotaError: "Too many requests! Please wait a moment and try again.",
-    langName: "🇬🇧 English"
+    quotaError: "Too many requests! Please wait a moment.",
   },
   fr: {
     appName: "Tamrini",
     tagline: "Ton Tuteur de Maths",
-    startChat: "Commencer",
-    typeMessage: "Écris ta question de maths...",
-    welcome: "Salut! 👋 Je suis Tamrini, ton tuteur de maths. Sur quel problème travailles-tu aujourd'hui?",
+    feature: "Je t'aide à comprendre les maths en posant des questions guidées — jamais de réponses directes!",
+    startBtn: "Commencer",
+    placeholder: "Pose ta question de maths...",
+    welcome: "Salut! 👋 Je suis Tamrini, ton tuteur de maths.\n\nJe ne te donnerai pas les réponses directement, mais je t'aiderai à réfléchir étape par étape.\n\nSur quoi travailles-tu aujourd'hui?",
     thinking: "Je réfléchis...",
+    online: "En ligne",
     error: "Oups! Une erreur s'est produite. Réessaie.",
-    quotaError: "Trop de demandes! Attends un moment et réessaie.",
-    langName: "🇫🇷 Français"
+    quotaError: "Trop de demandes! Attends un moment.",
   },
   ar: {
     appName: "تمريني",
     tagline: "معلمك في الرياضيات",
-    startChat: "ابدأ التعلم",
-    typeMessage: "اكتب سؤالك في الرياضيات...",
-    welcome: "مرحباً! 👋 أنا تمريني، معلمك في الرياضيات. ما هي المسألة التي تعمل عليها اليوم؟",
+    feature: "أساعدك على فهم الرياضيات من خلال طرح أسئلة توجيهية - لن أعطيك الإجابات مباشرة!",
+    startBtn: "ابدأ التعلم",
+    placeholder: "اكتب سؤالك في الرياضيات...",
+    welcome: "مرحباً! 👋 أنا تمريني، معلمك في الرياضيات.\n\nلن أعطيك الإجابات مباشرة، لكنني سأساعدك على التفكير خطوة بخطوة.\n\nما الذي تعمل عليه اليوم؟",
     thinking: "أفكر...",
+    online: "متصل",
     error: "عذراً! حدث خطأ. حاول مرة أخرى.",
-    quotaError: "طلبات كثيرة! انتظر قليلاً ثم حاول مرة أخرى.",
-    langName: "🇲🇦 العربية"
+    quotaError: "طلبات كثيرة! انتظر قليلاً.",
   }
 };
 
-// State
+// ===== STATE =====
 let currentLang = localStorage.getItem('tamrini_lang') || 'en';
 let messages = [];
 let isLoading = false;
 
-// API URL - Your Vercel API
 const API_URL = 'https://tamarini-app.vercel.app/api/chat';
 
-// Elements
-const homeScreen = document.getElementById('home-screen');
-const chatScreen = document.getElementById('chat-screen');
-const langBtn = document.getElementById('lang-btn');
-const langDropdown = document.getElementById('lang-dropdown');
-const startBtn = document.getElementById('start-btn');
-const backBtn = document.getElementById('back-btn');
-const messagesContainer = document.getElementById('messages');
-const messageInput = document.getElementById('message-input');
-const sendBtn = document.getElementById('send-btn');
-const loadingDiv = document.getElementById('loading');
-const errorDiv = document.getElementById('error');
+// ===== ELEMENTS =====
+const $ = id => document.getElementById(id);
+const splash = $('splash');
+const homeScreen = $('home-screen');
+const chatScreen = $('chat-screen');
+const startBtn = $('start-btn');
+const backBtn = $('back-btn');
+const messagesContainer = $('messages');
+const messageInput = $('message-input');
+const sendBtn = $('send-btn');
+const typingIndicator = $('typing');
+const errorContainer = $('error');
+const errorText = $('error-text');
+const errorClose = $('error-close');
+const langPills = document.querySelectorAll('.lang-pill');
 
-// Initialize
+// ===== INIT =====
 function init() {
+  // Hide splash after load
+  setTimeout(() => {
+    splash.classList.add('hidden');
+    homeScreen.classList.add('active');
+  }, 1500);
+
   updateLanguage(currentLang);
   setupEventListeners();
 }
 
-// Update Language
+// ===== LANGUAGE =====
 function updateLanguage(lang) {
   currentLang = lang;
   localStorage.setItem('tamrini_lang', lang);
   
   const t = translations[lang];
   
-  // Update text content
-  document.getElementById('app-title').textContent = t.appName;
-  document.getElementById('app-tagline').textContent = t.tagline;
-  document.getElementById('start-btn').textContent = t.startChat;
-  document.getElementById('chat-title').textContent = t.appName;
-  document.getElementById('message-input').placeholder = t.typeMessage;
-  document.getElementById('loading-text').textContent = t.thinking;
-  langBtn.textContent = t.langName;
+  // Update UI
+  $('app-name').textContent = t.appName;
+  $('app-tagline').textContent = t.tagline;
+  $('feature-text').textContent = t.feature;
+  $('start-text').textContent = t.startBtn;
+  $('chat-title').textContent = t.appName;
+  $('status-text').textContent = t.online;
+  messageInput.placeholder = t.placeholder;
   
-  // RTL support
-  if (lang === 'ar') {
-    document.body.classList.add('rtl');
-  } else {
-    document.body.classList.remove('rtl');
-  }
+  // Update pills
+  langPills.forEach(pill => {
+    pill.classList.toggle('active', pill.dataset.lang === lang);
+  });
   
-  // Close dropdown
-  langDropdown.classList.add('hidden');
+  // RTL
+  document.body.classList.toggle('rtl', lang === 'ar');
 }
 
-// Setup Event Listeners
+// ===== EVENT LISTENERS =====
 function setupEventListeners() {
-  // Language selector
-  langBtn.addEventListener('click', () => {
-    langDropdown.classList.toggle('hidden');
+  // Language pills
+  langPills.forEach(pill => {
+    pill.addEventListener('click', () => updateLanguage(pill.dataset.lang));
   });
-  
-  langDropdown.querySelectorAll('button').forEach(btn => {
-    btn.addEventListener('click', () => {
-      updateLanguage(btn.dataset.lang);
-    });
-  });
-  
-  // Close dropdown when clicking outside
-  document.addEventListener('click', (e) => {
-    if (!e.target.closest('.language-selector')) {
-      langDropdown.classList.add('hidden');
-    }
-  });
-  
+
   // Start chat
   startBtn.addEventListener('click', () => {
     homeScreen.classList.remove('active');
     chatScreen.classList.add('active');
     
-    // Add welcome message
     if (messages.length === 0) {
       addMessage('bot', translations[currentLang].welcome);
     }
+    
+    messageInput.focus();
   });
-  
+
   // Back button
   backBtn.addEventListener('click', () => {
     chatScreen.classList.remove('active');
     homeScreen.classList.add('active');
   });
-  
-  // Input handling
+
+  // Input
   messageInput.addEventListener('input', () => {
     sendBtn.disabled = !messageInput.value.trim() || isLoading;
-    
-    // Auto-resize
-    messageInput.style.height = 'auto';
-    messageInput.style.height = Math.min(messageInput.scrollHeight, 100) + 'px';
+    autoResize();
   });
-  
-  // Send message
+
+  // Send
   sendBtn.addEventListener('click', sendMessage);
   
   messageInput.addEventListener('keydown', (e) => {
@@ -144,87 +138,115 @@ function setupEventListeners() {
       sendMessage();
     }
   });
+
+  // Error close
+  errorClose.addEventListener('click', () => {
+    errorContainer.classList.add('hidden');
+  });
 }
 
-// Add Message
+// ===== AUTO RESIZE TEXTAREA =====
+function autoResize() {
+  messageInput.style.height = 'auto';
+  messageInput.style.height = Math.min(messageInput.scrollHeight, 120) + 'px';
+}
+
+// ===== ADD MESSAGE =====
 function addMessage(role, content) {
   messages.push({ role, content });
+  
+  const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   
   const messageDiv = document.createElement('div');
   messageDiv.className = `message ${role === 'user' ? 'user' : 'bot'}`;
   
   if (role === 'bot') {
-    messageDiv.innerHTML = `<span class="icon">📐</span>${content}`;
+    messageDiv.innerHTML = `
+      <div class="message-bubble">
+        <div class="message-header">
+          <span class="message-avatar">📐</span>
+          <span class="message-name">Tamrini</span>
+        </div>
+        <div class="message-content">${formatMessage(content)}</div>
+        <div class="message-time">${time}</div>
+      </div>
+    `;
   } else {
-    messageDiv.textContent = content;
+    messageDiv.innerHTML = `
+      <div class="message-bubble">
+        <div class="message-content">${formatMessage(content)}</div>
+        <div class="message-time">${time}</div>
+      </div>
+    `;
   }
   
   messagesContainer.appendChild(messageDiv);
+  scrollToBottom();
+}
+
+// ===== FORMAT MESSAGE =====
+function formatMessage(text) {
+  return text
+    .replace(/\n/g, '<br>')
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>');
+}
+
+// ===== SCROLL TO BOTTOM =====
+function scrollToBottom() {
   messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
 
-// Send Message
+// ===== SEND MESSAGE =====
 async function sendMessage() {
   const text = messageInput.value.trim();
   if (!text || isLoading) return;
-  
+
   // Add user message
   addMessage('user', text);
   messageInput.value = '';
   messageInput.style.height = 'auto';
   sendBtn.disabled = true;
-  
-  // Show loading
+
+  // Show typing
   isLoading = true;
-  loadingDiv.classList.remove('hidden');
-  errorDiv.classList.add('hidden');
-  
+  typingIndicator.classList.remove('hidden');
+  errorContainer.classList.add('hidden');
+  scrollToBottom();
+
   try {
-    // Build history (last 10 messages)
     const history = messages.slice(-10).map(m => ({
       role: m.role === 'bot' ? 'assistant' : m.role,
       content: m.content
     }));
-    
-    // Call API
+
     const response = await fetch(API_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         question: text,
         language: currentLang,
-        history: history
+        history
       })
     });
-    
+
     const data = await response.json();
-    
+
     if (!response.ok) {
-      if (data.details?.includes('quota')) {
-        throw new Error('QUOTA_EXCEEDED');
-      }
-      throw new Error(data.error || 'API request failed');
+      throw new Error(data.details?.includes('quota') ? 'QUOTA' : 'ERROR');
     }
-    
-    // Add bot response
+
     addMessage('bot', data.reply);
-    
+
   } catch (error) {
-    console.error('Error:', error);
     const t = translations[currentLang];
-    
-    if (error.message === 'QUOTA_EXCEEDED') {
-      errorDiv.textContent = '⚠️ ' + t.quotaError;
-    } else {
-      errorDiv.textContent = '⚠️ ' + t.error;
-    }
-    errorDiv.classList.remove('hidden');
+    errorText.textContent = error.message === 'QUOTA' ? t.quotaError : t.error;
+    errorContainer.classList.remove('hidden');
   }
-  
-  // Hide loading
+
   isLoading = false;
-  loadingDiv.classList.add('hidden');
+  typingIndicator.classList.add('hidden');
 }
 
-// Start app
-init();
+// ===== START =====
+document.addEventListener('DOMContentLoaded', init);
