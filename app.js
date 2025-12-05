@@ -1,315 +1,456 @@
-// ===== TRANSLATIONS =====
-const translations = {
-  en: {
-    tagline: "Math Tutor",
-    newExercise: "New Exercise",
-    emptyTitle: "Ready to Learn?",
-    emptyDesc: "Click \"New Exercise\" or type your math question below",
-    placeholder: "Type your math question...",
-    thinking: "Thinking...",
-    error: "Something went wrong. Please try again.",
-    quotaError: "Too many requests. Please wait a moment.",
-    navHome: "Home",
-    navHistory: "History",
-    navSettings: "Settings",
-    navAbout: "About",
-    settingsTitle: "Settings",
-    langSection: "Language",
-    clearSection: "Data",
-    clearChat: "Clear Chat History",
-    aboutTitle: "About",
-    whatIs: "What is Tamrini?",
-    whatIsDesc: "Tamrini is an AI-powered math tutor designed for students aged 12-18. Instead of giving direct answers, Tamrini guides you through problems step by step, helping you truly understand mathematics.",
-    howWorks: "How it Works",
-    subjects: "Subjects Covered",
-    historyTitle: "History",
-    historyEmpty: "No History Yet",
-    historyEmptyDesc: "Your solved exercises will appear here",
-    greeting: "Hello! 👋 I'm Tamrini, your math tutor.\n\nTell me what exercise you're working on, and I'll help you solve it step by step.",
-    newExerciseGreeting: "Great! Let's start a new exercise. 📝\n\nWhat math problem would you like to work on?"
-  },
-  fr: {
-    tagline: "Tuteur de Maths",
-    newExercise: "Nouvel Exercice",
-    emptyTitle: "Prêt à Apprendre?",
-    emptyDesc: "Clique sur \"Nouvel Exercice\" ou tape ta question ci-dessous",
-    placeholder: "Écris ta question de maths...",
-    thinking: "Je réfléchis...",
-    error: "Une erreur s'est produite. Réessaie.",
-    quotaError: "Trop de demandes. Attends un moment.",
-    navHome: "Accueil",
-    navHistory: "Historique",
-    navSettings: "Paramètres",
-    navAbout: "À propos",
-    settingsTitle: "Paramètres",
-    langSection: "Langue",
-    clearSection: "Données",
-    clearChat: "Effacer l'historique",
-    aboutTitle: "À propos",
-    whatIs: "Qu'est-ce que Tamrini?",
-    whatIsDesc: "Tamrini est un tuteur de maths alimenté par l'IA, conçu pour les élèves de 12 à 18 ans. Au lieu de donner des réponses directes, Tamrini te guide pas à pas pour vraiment comprendre les mathématiques.",
-    howWorks: "Comment ça marche",
-    subjects: "Matières couvertes",
-    historyTitle: "Historique",
-    historyEmpty: "Pas encore d'historique",
-    historyEmptyDesc: "Tes exercices résolus apparaîtront ici",
-    greeting: "Bonjour! 👋 Je suis Tamrini, ton tuteur de maths.\n\nDis-moi sur quel exercice tu travailles, et je t'aiderai à le résoudre étape par étape.",
-    newExerciseGreeting: "Super! Commençons un nouvel exercice. 📝\n\nQuel problème de maths veux-tu résoudre?"
-  },
-  ar: {
-    tagline: "معلم الرياضيات",
-    newExercise: "تمرين جديد",
-    emptyTitle: "مستعد للتعلم؟",
-    emptyDesc: "انقر على \"تمرين جديد\" أو اكتب سؤالك أدناه",
-    placeholder: "اكتب سؤالك في الرياضيات...",
-    thinking: "أفكر...",
-    error: "حدث خطأ. حاول مرة أخرى.",
-    quotaError: "طلبات كثيرة. انتظر قليلاً.",
-    navHome: "الرئيسية",
-    navHistory: "السجل",
-    navSettings: "الإعدادات",
-    navAbout: "حول",
-    settingsTitle: "الإعدادات",
-    langSection: "اللغة",
-    clearSection: "البيانات",
-    clearChat: "مسح المحادثات",
-    aboutTitle: "حول التطبيق",
-    whatIs: "ما هو تمريني؟",
-    whatIsDesc: "تمريني هو معلم رياضيات ذكي مصمم للطلاب من 12 إلى 18 سنة. بدلاً من إعطاء الإجابات مباشرة، يرشدك تمريني خطوة بخطوة لفهم الرياضيات حقاً.",
-    howWorks: "كيف يعمل",
-    subjects: "المواد المتاحة",
-    historyTitle: "السجل",
-    historyEmpty: "لا يوجد سجل بعد",
-    historyEmptyDesc: "ستظهر تمارينك المحلولة هنا",
-    greeting: "مرحباً! 👋 أنا تمريني، معلمك في الرياضيات.\n\nأخبرني ما هو التمرين الذي تعمل عليه، وسأساعدك على حله خطوة بخطوة.",
-    newExerciseGreeting: "ممتاز! لنبدأ تمريناً جديداً. 📝\n\nما هي المسألة التي تريد حلها؟"
-  }
-};
+console.log('Tamrini Starting...');
 
-// ===== STATE =====
-let currentLang = localStorage.getItem('tamrini_lang') || 'en';
-let messages = JSON.parse(localStorage.getItem('tamrini_messages') || '[]');
-let history = JSON.parse(localStorage.getItem('tamrini_history') || '[]');
-let isLoading = false;
-
-const API_URL = 'https://tamarini-app.vercel.app/api/chat';
-
-// ===== ELEMENTS =====
-const $ = id => document.getElementById(id);
-
-// ===== PROFESSIONAL PROMPT =====
-function getSystemPrompt(lang) {
-  const prompts = {
-    en: `You are Tamrini, a professional math tutor for students aged 12-18.
-
-IMPORTANT RULES:
-1. NEVER give the direct answer immediately
-2. Guide the student with clear, focused questions
-3. Break down problems into small, manageable steps
-4. When student is stuck, give ONE small hint at a time
-5. Keep responses SHORT and CLEAR (2-4 sentences max)
-6. Use simple language appropriate for the student's level
-7. Be encouraging but not excessive
-8. If the student's answer is wrong, gently redirect without discouraging
-9. When the student solves it correctly, briefly congratulate and summarize what they learned
-
-RESPONSE FORMAT:
-- Start with acknowledging their question/answer
-- Ask ONE guiding question OR give ONE hint
-- Keep it brief and focused
-
-Respond in English.`,
-
-    fr: `Tu es Tamrini, un tuteur de maths professionnel pour les élèves de 12 à 18 ans.
-
-RÈGLES IMPORTANTES:
-1. Ne JAMAIS donner la réponse directement
-2. Guide l'élève avec des questions claires et ciblées
-3. Décompose les problèmes en petites étapes
-4. Si l'élève bloque, donne UN indice à la fois
-5. Garde les réponses COURTES et CLAIRES (2-4 phrases max)
-6. Utilise un langage simple adapté au niveau de l'élève
-7. Sois encourageant mais pas excessif
-8. Si la réponse est fausse, redirige gentiment sans décourager
-9. Quand l'élève réussit, félicite brièvement et résume ce qu'il a appris
-
-FORMAT DE RÉPONSE:
-- Commence par reconnaître la question/réponse
-- Pose UNE question guidée OU donne UN indice
-- Reste bref et concentré
-
-Réponds en français.`,
-
-    ar: `أنت تمريني، معلم رياضيات محترف للطلاب من 12 إلى 18 سنة.
-
-القواعد المهمة:
-1. لا تعطي الإجابة المباشرة أبداً
-2. وجّه الطالب بأسئلة واضحة ومركزة
-3. قسّم المسائل إلى خطوات صغيرة
-4. إذا توقف الطالب، أعطِ تلميحاً واحداً فقط
-5. اجعل الردود قصيرة وواضحة (2-4 جمل كحد أقصى)
-6. استخدم لغة بسيطة مناسبة لمستوى الطالب
-7. كن مشجعاً لكن بدون مبالغة
-8. إذا كانت الإجابة خاطئة، صحح بلطف دون إحباط
-9. عندما ينجح الطالب، هنئه باختصار ولخص ما تعلمه
-
-صيغة الرد:
-- ابدأ بالاعتراف بالسؤال/الإجابة
-- اطرح سؤالاً توجيهياً واحداً أو أعطِ تلميحاً واحداً
-- كن موجزاً ومركزاً
-
-أجب بالعربية.`
+window.onload = function() {
+  console.log('Page Loaded!');
+  
+  // ===== STATE =====
+  var currentLang = localStorage.getItem('tamrini_lang') || 'en';
+  var messages = [];
+  var history = [];
+  var isLoading = false;
+  
+  var API_URL = 'https://tamarini-app.vercel.app/api/chat';
+  
+  // ===== TRANSLATIONS =====
+  var translations = {
+    en: {
+      tagline: "Math Tutor",
+      newExercise: "New Exercise",
+      emptyTitle: "Ready to Learn?",
+      emptyDesc: "Click \"New Exercise\" or type your math question below",
+      placeholder: "Type your math question...",
+      thinking: "Thinking...",
+      error: "Something went wrong. Please try again.",
+      quotaError: "Too many requests. Please wait a moment.",
+      greeting: "Hello! 👋 I'm Tamrini, your math tutor.\n\nTell me what exercise you're working on, and I'll help you solve it step by step.",
+      newGreeting: "Great! Let's start a new exercise. 📝\n\nWhat math problem would you like to work on?"
+    },
+    fr: {
+      tagline: "Tuteur de Maths",
+      newExercise: "Nouvel Exercice",
+      emptyTitle: "Prêt à Apprendre?",
+      emptyDesc: "Clique sur \"Nouvel Exercice\" ou tape ta question",
+      placeholder: "Écris ta question de maths...",
+      thinking: "Je réfléchis...",
+      error: "Une erreur s'est produite. Réessaie.",
+      quotaError: "Trop de demandes. Attends un moment.",
+      greeting: "Bonjour! 👋 Je suis Tamrini, ton tuteur de maths.\n\nDis-moi sur quel exercice tu travailles.",
+      newGreeting: "Super! Commençons un nouvel exercice. 📝\n\nQuel problème veux-tu résoudre?"
+    },
+    ar: {
+      tagline: "معلم الرياضيات",
+      newExercise: "تمرين جديد",
+      emptyTitle: "مستعد للتعلم؟",
+      emptyDesc: "انقر على \"تمرين جديد\" أو اكتب سؤالك",
+      placeholder: "اكتب سؤالك في الرياضيات...",
+      thinking: "أفكر...",
+      error: "حدث خطأ. حاول مرة أخرى.",
+      quotaError: "طلبات كثيرة. انتظر قليلاً.",
+      greeting: "مرحباً! 👋 أنا تمريني، معلمك في الرياضيات.\n\nأخبرني ما هو التمرين الذي تعمل عليه.",
+      newGreeting: "ممتاز! لنبدأ تمريناً جديداً. 📝\n\nما هي المسألة التي تريد حلها؟"
+    }
   };
   
-  return prompts[lang] || prompts.en;
-}
-
-// ===== INIT =====
-function init() {
+  // ===== LOAD SAVED DATA =====
+  try {
+    var savedMessages = localStorage.getItem('tamrini_messages');
+    if (savedMessages) {
+      messages = JSON.parse(savedMessages);
+    }
+    var savedHistory = localStorage.getItem('tamrini_history');
+    if (savedHistory) {
+      history = JSON.parse(savedHistory);
+    }
+  } catch(e) {
+    console.log('Error loading data:', e);
+  }
+  
+  // ===== INITIALIZE =====
   updateLanguage(currentLang);
-  setupEventListeners();
   renderMessages();
   renderHistory();
-}
-
-// ===== UPDATE LANGUAGE =====
-function updateLanguage(lang) {
-  currentLang = lang;
-  localStorage.setItem('tamrini_lang', lang);
+  setupListeners();
   
-  const t = translations[lang];
+  console.log('Tamrini Ready!');
   
-  // Update all text elements
-  $('tagline').textContent = t.tagline;
-  $('new-exercise-text').textContent = t.newExercise;
-  $('empty-title').textContent = t.emptyTitle;
-  $('empty-desc').textContent = t.emptyDesc;
-  $('message-input').placeholder = t.placeholder;
-  $('typing-text').textContent = t.thinking;
-  $('nav-home').textContent = t.navHome;
-  $('nav-history').textContent = t.navHistory;
-  $('nav-settings').textContent = t.navSettings;
-  $('nav-about').textContent = t.navAbout;
-  $('settings-title').textContent = t.settingsTitle;
-  $('lang-section-title').textContent = t.langSection;
-  $('clear-section-title').textContent = t.clearSection;
-  $('clear-chat-text').textContent = t.clearChat;
-  $('about-title').textContent = t.aboutTitle;
-  $('what-is-title').textContent = t.whatIs;
-  $('what-is-desc').textContent = t.whatIsDesc;
-  $('how-works-title').textContent = t.howWorks;
-  $('subjects-title').textContent = t.subjects;
-  $('history-title').textContent = t.historyTitle;
-  $('history-empty-title').textContent = t.historyEmpty;
-  $('history-empty-desc').textContent = t.historyEmptyDesc;
-  
-  // Update active states
-  document.querySelectorAll('.lang-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.lang === lang);
-  });
-  
-  document.querySelectorAll('.option-check').forEach(check => {
-    check.classList.toggle('active', check.dataset.check === lang);
-  });
-  
-  // RTL
-  document.body.classList.toggle('rtl', lang === 'ar');
-}
-
-// ===== EVENT LISTENERS =====
-function setupEventListeners() {
-  // Header language buttons
-  document.querySelectorAll('.lang-btn').forEach(btn => {
-    btn.addEventListener('click', () => updateLanguage(btn.dataset.lang));
-  });
-  
-  // Settings language options
-  document.querySelectorAll('.setting-option[data-lang]').forEach(btn => {
-    btn.addEventListener('click', () => updateLanguage(btn.dataset.lang));
-  });
-  
-  // Navigation
-  document.querySelectorAll('.nav-item').forEach(item => {
-    item.addEventListener('click', () => {
-      const page = item.dataset.page;
-      
-      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-      
-      $(`page-${page}`).classList.add('active');
-      item.classList.add('active');
+  // ===== UPDATE LANGUAGE =====
+  function updateLanguage(lang) {
+    currentLang = lang;
+    localStorage.setItem('tamrini_lang', lang);
+    
+    var t = translations[lang];
+    
+    // Update texts
+    var tagline = document.getElementById('tagline');
+    if (tagline) tagline.textContent = t.tagline;
+    
+    var newExText = document.getElementById('new-exercise-text');
+    if (newExText) newExText.textContent = t.newExercise;
+    
+    var emptyTitle = document.getElementById('empty-title');
+    if (emptyTitle) emptyTitle.textContent = t.emptyTitle;
+    
+    var emptyDesc = document.getElementById('empty-desc');
+    if (emptyDesc) emptyDesc.textContent = t.emptyDesc;
+    
+    var input = document.getElementById('message-input');
+    if (input) input.placeholder = t.placeholder;
+    
+    var typingText = document.getElementById('typing-text');
+    if (typingText) typingText.textContent = t.thinking;
+    
+    // Update language buttons
+    var langBtns = document.querySelectorAll('.lang-btn');
+    langBtns.forEach(function(btn) {
+      if (btn.dataset.lang === lang) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
     });
-  });
-  
-  // New Exercise
-  $('new-exercise-btn').addEventListener('click', () => {
-    messages = [];
-    localStorage.setItem('tamrini_messages', '[]');
-    renderMessages();
-    addMessage('bot', translations[currentLang].newExerciseGreeting);
-    $('message-input').focus();
-  });
-  
-  // Clear chat
-  $('clear-chat-btn').addEventListener('click', () => {
-    if (confirm('Are you sure you want to clear chat history?')) {
-      messages = [];
-      history = [];
-      localStorage.setItem('tamrini_messages', '[]');
-      localStorage.setItem('tamrini_history', '[]');
-      renderMessages();
-      renderHistory();
-    }
-  });
-  
-  // Input
-  const input = $('message-input');
-  const sendBtn = $('send-btn');
-  
-  input.addEventListener('input', () => {
-    sendBtn.disabled = !input.value.trim() || isLoading;
-    autoResize(input);
-  });
-  
-  sendBtn.addEventListener('click', sendMessage);
-  
-  input.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
-    }
-  });
-  
-  // Error close
-  $('error-close').addEventListener('click', () => {
-    $('error').classList.add('hidden');
-  });
-}
-
-// ===== AUTO RESIZE =====
-function autoResize(el) {
-  el.style.height = 'auto';
-  el.style.height = Math.min(el.scrollHeight, 100) + 'px';
-}
-
-// ===== RENDER MESSAGES =====
-function renderMessages() {
-  const container = $('messages');
-  const emptyState = $('empty-state');
-  
-  container.innerHTML = '';
-  
-  if (messages.length === 0) {
-    emptyState.classList.remove('hidden');
-  } else {
-    emptyState.classList.add('hidden');
-    messages.forEach(msg => {
-      container.appendChild(createMessageElement(msg));
+    
+    // Update settings checkmarks
+    var checks = document.querySelectorAll('.option-check');
+    checks.forEach(function(check) {
+      if (check.dataset.check === lang) {
+        check.classList.add('active');
+      } else {
+        check.classList.remove('active');
+      }
     });
-    scrollToBottom();
+    
+    // RTL for Arabic
+    if (lang === 'ar') {
+      document.body.classList.add('rtl');
+    } else {
+      document.body.classList.remove('rtl');
+    }
+    
+    console.log('Language changed to:', lang);
   }
-}
-
-// ===== CREATE MESSAGE ELEMENT =====
-function createMessageElement(msg) {
-  const 
+  
+  // ===== SETUP LISTENERS =====
+  function setupListeners() {
+    console.log('Setting up listeners...');
+    
+    // Language buttons in header
+    var langBtns = document.querySelectorAll('.lang-btn');
+    langBtns.forEach(function(btn) {
+      btn.onclick = function() {
+        updateLanguage(this.dataset.lang);
+      };
+    });
+    
+    // Language options in settings
+    var langOptions = document.querySelectorAll('.setting-option[data-lang]');
+    langOptions.forEach(function(btn) {
+      btn.onclick = function() {
+        updateLanguage(this.dataset.lang);
+      };
+    });
+    
+    // Bottom navigation
+    var navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(function(item) {
+      item.onclick = function() {
+        var page = this.dataset.page;
+        console.log('Navigate to:', page);
+        
+        // Hide all pages
+        var pages = document.querySelectorAll('.page');
+        pages.forEach(function(p) {
+          p.classList.remove('active');
+        });
+        
+        // Deactivate all nav items
+        navItems.forEach(function(n) {
+          n.classList.remove('active');
+        });
+        
+        // Show selected page
+        var targetPage = document.getElementById('page-' + page);
+        if (targetPage) {
+          targetPage.classList.add('active');
+        }
+        
+        // Activate nav item
+        this.classList.add('active');
+      };
+    });
+    
+    // New Exercise button
+    var newExBtn = document.getElementById('new-exercise-btn');
+    if (newExBtn) {
+      newExBtn.onclick = function() {
+        console.log('New Exercise clicked');
+        messages = [];
+        localStorage.setItem('tamrini_messages', '[]');
+        renderMessages();
+        addMessage('bot', translations[currentLang].newGreeting);
+        
+        var input = document.getElementById('message-input');
+        if (input) input.focus();
+      };
+    }
+    
+    // Clear chat button
+    var clearBtn = document.getElementById('clear-chat-btn');
+    if (clearBtn) {
+      clearBtn.onclick = function() {
+        if (confirm('Clear all chat history?')) {
+          messages = [];
+          history = [];
+          localStorage.setItem('tamrini_messages', '[]');
+          localStorage.setItem('tamrini_history', '[]');
+          renderMessages();
+          renderHistory();
+        }
+      };
+    }
+    
+    // Message input
+    var input = document.getElementById('message-input');
+    var sendBtn = document.getElementById('send-btn');
+    
+    if (input) {
+      input.oninput = function() {
+        if (sendBtn) {
+          sendBtn.disabled = !this.value.trim() || isLoading;
+        }
+        // Auto resize
+        this.style.height = 'auto';
+        this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+      };
+      
+      input.onkeydown = function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          sendMessage();
+        }
+      };
+    }
+    
+    // Send button
+    if (sendBtn) {
+      sendBtn.onclick = function() {
+        sendMessage();
+      };
+    }
+    
+    // Error close
+    var errorClose = document.getElementById('error-close');
+    if (errorClose) {
+      errorClose.onclick = function() {
+        var error = document.getElementById('error');
+        if (error) error.classList.add('hidden');
+      };
+    }
+    
+    console.log('Listeners ready!');
+  }
+  
+  // ===== RENDER MESSAGES =====
+  function renderMessages() {
+    var container = document.getElementById('messages');
+    var emptyState = document.getElementById('empty-state');
+    
+    if (!container) return;
+    
+    container.innerHTML = '';
+    
+    if (messages.length === 0) {
+      if (emptyState) emptyState.classList.remove('hidden');
+    } else {
+      if (emptyState) emptyState.classList.add('hidden');
+      
+      messages.forEach(function(msg) {
+        var el = createMessageEl(msg);
+        container.appendChild(el);
+      });
+      
+      scrollToBottom();
+    }
+  }
+  
+  // ===== CREATE MESSAGE ELEMENT =====
+  function createMessageEl(msg) {
+    var div = document.createElement('div');
+    div.className = 'message ' + (msg.role === 'user' ? 'user' : 'bot');
+    
+    var avatar = msg.role === 'user' ? '👤' : '📐';
+    var time = msg.time || '';
+    
+    var text = msg.content || '';
+    text = text.replace(/\n/g, '<br>');
+    
+    div.innerHTML = '<div class="message-avatar">' + avatar + '</div>' +
+      '<div class="message-bubble">' +
+      '<div class="message-text">' + text + '</div>' +
+      '<div class="message-time">' + time + '</div>' +
+      '</div>';
+    
+    return div;
+  }
+  
+  // ===== ADD MESSAGE =====
+  function addMessage(role, content) {
+    var time = new Date().toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
+    var msg = {role: role, content: content, time: time};
+    
+    messages.push(msg);
+    localStorage.setItem('tamrini_messages', JSON.stringify(messages));
+    
+    var emptyState = document.getElementById('empty-state');
+    if (emptyState) emptyState.classList.add('hidden');
+    
+    var container = document.getElementById('messages');
+    if (container) {
+      var el = createMessageEl(msg);
+      container.appendChild(el);
+      scrollToBottom();
+    }
+    
+    // Save to history
+    if (role === 'user' && messages.length <= 2) {
+      saveToHistory(content);
+    }
+  }
+  
+  // ===== SAVE TO HISTORY =====
+  function saveToHistory(question) {
+    var item = {
+      id: Date.now(),
+      question: question.substring(0, 100),
+      date: new Date().toLocaleDateString(),
+      time: new Date().toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})
+    };
+    
+    history.unshift(item);
+    if (history.length > 20) history.pop();
+    
+    localStorage.setItem('tamrini_history', JSON.stringify(history));
+    renderHistory();
+  }
+  
+  // ===== RENDER HISTORY =====
+  function renderHistory() {
+    var container = document.getElementById('history-list');
+    var emptyState = document.getElementById('history-empty');
+    
+    if (!container) return;
+    
+    if (history.length === 0) {
+      if (emptyState) emptyState.classList.remove('hidden');
+      container.innerHTML = '';
+    } else {
+      if (emptyState) emptyState.classList.add('hidden');
+      
+      var html = '';
+      history.forEach(function(item) {
+        html += '<div class="history-item">' +
+          '<div class="history-question">' + item.question + '</div>' +
+          '<div class="history-meta">' +
+          '<span>' + item.date + '</span>' +
+          '<span>' + item.time + '</span>' +
+          '</div></div>';
+      });
+      
+      container.innerHTML = html;
+    }
+  }
+  
+  // ===== SCROLL TO BOTTOM =====
+  function scrollToBottom() {
+    var container = document.getElementById('messages');
+    if (container && container.parentElement) {
+      container.parentElement.scrollTop = container.parentElement.scrollHeight;
+    }
+  }
+  
+  // ===== SEND MESSAGE =====
+  function sendMessage() {
+    var input = document.getElementById('message-input');
+    var sendBtn = document.getElementById('send-btn');
+    
+    if (!input) return;
+    
+    var text = input.value.trim();
+    if (!text || isLoading) return;
+    
+    console.log('Sending:', text);
+    
+    // Add user message
+    addMessage('user', text);
+    
+    // Clear input
+    input.value = '';
+    input.style.height = 'auto';
+    if (sendBtn) sendBtn.disabled = true;
+    
+    // Show typing
+    isLoading = true;
+    var typing = document.getElementById('typing');
+    if (typing) typing.classList.remove('hidden');
+    
+    // Hide error
+    var error = document.getElementById('error');
+    if (error) error.classList.add('hidden');
+    
+    scrollToBottom();
+    
+    // Build history
+    var chatHistory = [];
+    var recent = messages.slice(-10);
+    recent.forEach(function(m) {
+      chatHistory.push({
+        role: m.role === 'bot' ? 'assistant' : 'user',
+        content: m.content
+      });
+    });
+    
+    // Call API
+    fetch(API_URL, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        question: text,
+        language: currentLang,
+        history: chatHistory
+      })
+    })
+    .then(function(response) {
+      return response.json();
+    })
+    .then(function(data) {
+      console.log('Response:', data);
+      
+      if (data.error) {
+        throw new Error(data.details || data.error);
+      }
+      
+      addMessage('bot', data.reply);
+    })
+    .catch(function(err) {
+      console.error('Error:', err);
+      
+      var t = translations[currentLang];
+      var errorText = document.getElementById('error-text');
+      
+      if (errorText) {
+        if (err.message && err.message.includes('quota')) {
+          errorText.textContent = t.quotaError;
+        } else {
+          errorText.textContent = t.error;
+        }
+      }
+      
+      var error = document.getElementById('error');
+      if (error) error.classList.remove('hidden');
+    })
+    .finally(function() {
+      isLoading = false;
+      var typing = document.getElementById('typing');
+      if (typing) typing.classList.add('hidden');
+    });
+  }
+};
