@@ -1,879 +1,668 @@
-/* ===== VARIABLES ===== */
-:root {
-  --primary: #4F46E5;
-  --primary-dark: #4338CA;
-  --primary-light: #818CF8;
-  --secondary: #10B981;
-  --accent: #F59E0B;
+console.log('Tamrini Starting...');
+
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('DOM Ready!');
   
-  --bg: #F9FAFB;
-  --bg-white: #FFFFFF;
-  --bg-secondary: #F3F4F6;
+  // ===== STATE =====
+  var currentLang = localStorage.getItem('tamrini_lang') || 'en';
+  var darkMode = localStorage.getItem('tamrini_dark') === 'true';
+  var messages = [];
+  var history = [];
+  var isLoading = false;
+  var lastExercise = '';
+  var selectedImage = null;
   
-  --text: #111827;
-  --text-secondary: #6B7280;
-  --text-light: #9CA3AF;
+  var API_URL = 'https://tamarini-app.vercel.app/api/chat';
   
-  --border: #E5E7EB;
-  --error: #EF4444;
-  --success: #10B981;
-  --warning: #F59E0B;
+  // ===== TRANSLATIONS =====
+  var translations = {
+    en: {
+      tagline: "Math Tutor",
+      newExercise: "New Exercise",
+      similarExercise: "Similar Exercise",
+      emptyTitle: "Ready to Learn?",
+      emptyDesc: "Click \"New Exercise\" or type your math question below",
+      placeholder: "Type your math question...",
+      thinking: "Thinking...",
+      error: "Something went wrong. Please try again.",
+      quotaError: "Too many requests. Please wait a moment.",
+      navHome: "Home",
+      navHistory: "History",
+      navSettings: "Settings",
+      navAbout: "About",
+      themeSection: "Appearance",
+      lightMode: "Light Mode",
+      darkMode: "Dark Mode",
+      langSection: "Language",
+      clearSection: "Data",
+      clearChat: "Clear Chat History",
+      greeting: "Hello! 👋 I'm Tamrini, your math tutor.\n\nType your question or upload an image!",
+      newGreeting: "Let's start! 📝\n\nWhat math problem do you want to solve?",
+      solved: "Solved",
+      inProgress: "In Progress",
+      msgs: "msgs"
+    },
+    fr: {
+      tagline: "Tuteur de Maths",
+      newExercise: "Nouvel Exercice",
+      similarExercise: "Exercice Similaire",
+      emptyTitle: "Prêt à Apprendre?",
+      emptyDesc: "Clique sur \"Nouvel Exercice\" ou tape ta question",
+      placeholder: "Écris ta question de maths...",
+      thinking: "Je réfléchis...",
+      error: "Erreur. Réessaie.",
+      quotaError: "Trop de demandes. Attends.",
+      navHome: "Accueil",
+      navHistory: "Historique",
+      navSettings: "Paramètres",
+      navAbout: "À propos",
+      themeSection: "Apparence",
+      lightMode: "Mode Clair",
+      darkMode: "Mode Sombre",
+      langSection: "Langue",
+      clearSection: "Données",
+      clearChat: "Effacer l'historique",
+      greeting: "Bonjour! 👋 Je suis Tamrini.\n\nÉcris ta question ou télécharge une image!",
+      newGreeting: "C'est parti! 📝\n\nQuel problème veux-tu résoudre?",
+      solved: "Résolu",
+      inProgress: "En cours",
+      msgs: "msgs"
+    },
+    ar: {
+      tagline: "معلم الرياضيات",
+      newExercise: "تمرين جديد",
+      similarExercise: "تمرين مشابه",
+      emptyTitle: "مستعد للتعلم؟",
+      emptyDesc: "انقر على تمرين جديد أو اكتب سؤالك",
+      placeholder: "اكتب سؤالك...",
+      thinking: "أفكر...",
+      error: "حدث خطأ. حاول مرة أخرى.",
+      quotaError: "طلبات كثيرة. انتظر.",
+      navHome: "الرئيسية",
+      navHistory: "السجل",
+      navSettings: "الإعدادات",
+      navAbout: "حول",
+      themeSection: "المظهر",
+      lightMode: "فاتح",
+      darkMode: "داكن",
+      langSection: "اللغة",
+      clearSection: "البيانات",
+      clearChat: "مسح المحادثات",
+      greeting: "مرحباً! 👋 أنا تمريني.\n\nاكتب سؤالك أو ارفع صورة!",
+      newGreeting: "هيا نبدأ! 📝\n\nما المسألة؟",
+      solved: "محلول",
+      inProgress: "جاري",
+      msgs: "رسائل"
+    }
+  };
   
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 24px;
-  --radius-full: 9999px;
+  // ===== LOAD SAVED DATA =====
+  try {
+    var s1 = localStorage.getItem('tamrini_messages');
+    if (s1) messages = JSON.parse(s1);
+    var s2 = localStorage.getItem('tamrini_history');
+    if (s2) history = JSON.parse(s2);
+    var s3 = localStorage.getItem('tamrini_exercise');
+    if (s3) lastExercise = s3;
+  } catch(e) {
+    console.log('Load error:', e);
+  }
   
-  --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
-  --shadow-md: 0 4px 6px rgba(0,0,0,0.07);
-  --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
+  // ===== INIT =====
+  applyTheme(darkMode);
+  applyLanguage(currentLang);
+  renderMessages();
+  renderHistory();
+  showHideSimilarBtn();
+  bindEvents();
   
-  --safe-top: env(safe-area-inset-top);
-  --safe-bottom: env(safe-area-inset-bottom);
+  console.log('Tamrini Ready!');
   
-  --nav-height: 70px;
-}
-
-/* ===== DARK MODE ===== */
-body.dark-mode {
-  --bg: #111827;
-  --bg-white: #1F2937;
-  --bg-secondary: #374151;
-  --text: #F9FAFB;
-  --text-secondary: #D1D5DB;
-  --text-light: #9CA3AF;
-  --border: #374151;
-}
-
-/* ===== RESET ===== */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent;
-}
-
-html, body {
-  height: 100%;
-  overflow: hidden;
-}
-
-body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  line-height: 1.5;
-  transition: background 0.3s, color 0.3s;
-}
-
-.hidden {
-  display: none !important;
-}
-
-/* ===== PAGES ===== */
-.page {
-  display: none;
-  flex-direction: column;
-  height: 100%;
-  padding-bottom: var(--nav-height);
-}
-
-.page.active {
-  display: flex;
-}
-
-/* ===== HEADER ===== */
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 16px;
-  padding-top: calc(12px + var(--safe-top));
-  background: var(--bg-white);
-  border-bottom: 1px solid var(--border);
-  transition: background 0.3s, border-color 0.3s;
-}
-
-.header-left {
-  display: flex;
-  align-items: center;
-}
-
-.logo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.logo-icon {
-  font-size: 32px;
-}
-
-.logo-text {
-  display: flex;
-  flex-direction: column;
-}
-
-.logo-name {
-  font-size: 20px;
-  font-weight: 800;
-  color: var(--primary);
-  line-height: 1.2;
-}
-
-.logo-tagline {
-  font-size: 11px;
-  color: var(--text-secondary);
-  font-weight: 500;
-}
-
-.header-right {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.icon-button {
-  width: 40px;
-  height: 40px;
-  border: none;
-  background: var(--bg-secondary);
-  border-radius: var(--radius-full);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
-  transition: background 0.2s, transform 0.2s;
-}
-
-.icon-button:active {
-  transform: scale(0.95);
-}
-
-.lang-switcher {
-  display: flex;
-  gap: 4px;
-  background: var(--bg-secondary);
-  padding: 4px;
-  border-radius: var(--radius-full);
-}
-
-.lang-btn {
-  padding: 6px 12px;
-  border: none;
-  background: transparent;
-  color: var(--text-secondary);
-  font-size: 13px;
-  font-weight: 600;
-  border-radius: var(--radius-full);
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.lang-btn.active {
-  background: var(--primary);
-  color: white;
-}
-
-/* ===== ACTION BUTTONS ===== */
-.action-buttons {
-  display: flex;
-  gap: 10px;
-  padding: 12px 16px;
-  background: var(--bg-white);
-  border-bottom: 1px solid var(--border);
-  transition: background 0.3s, border-color 0.3s;
-}
-
-.action-btn {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 14px 20px;
-  border: none;
-  border-radius: var(--radius-md);
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.action-btn:active {
-  transform: scale(0.98);
-}
-
-.action-btn.primary {
-  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-  color: white;
-  box-shadow: var(--shadow-md);
-}
-
-.action-btn.secondary {
-  background: linear-gradient(135deg, var(--secondary), #059669);
-  color: white;
-  box-shadow: var(--shadow-md);
-}
-
-.action-btn .btn-icon {
-  font-size: 18px;
-}
-
-/* ===== CHAT CONTAINER ===== */
-.chat-container {
-  flex: 1;
-  overflow-y: auto;
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-}
-
-/* Empty State */
-.empty-state {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 40px 20px;
-}
-
-.empty-icon {
-  font-size: 64px;
-  margin-bottom: 16px;
-}
-
-.empty-state h3 {
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--text);
-  margin-bottom: 8px;
-}
-
-.empty-state p {
-  font-size: 14px;
-  color: var(--text-secondary);
-  max-width: 260px;
-}
-
-/* Messages List */
-.messages-list {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.messages-list:not(:empty) ~ .empty-state {
-  display: none;
-}
-
-/* Message */
-.message {
-  display: flex;
-  gap: 12px;
-  animation: fadeIn 0.3s ease;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.message.user {
-  flex-direction: row-reverse;
-}
-
-.message-avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: var(--radius-md);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  flex-shrink: 0;
-}
-
-.message.bot .message-avatar {
-  background: var(--primary);
-}
-
-.message.user .message-avatar {
-  background: var(--secondary);
-}
-
-.message-bubble {
-  max-width: 80%;
-  padding: 12px 16px;
-  border-radius: var(--radius-lg);
-  font-size: 14px;
-  line-height: 1.6;
-  word-wrap: break-word;
-  white-space: pre-wrap;
-}
-
-.message.bot .message-bubble {
-  background: var(--bg-white);
-  border: 1px solid var(--border);
-  border-bottom-left-radius: 4px;
-}
-
-.message.user .message-bubble {
-  background: var(--primary);
-  color: white;
-  border-bottom-right-radius: 4px;
-}
-
-.message-image {
-  max-width: 100%;
-  max-height: 200px;
-  border-radius: var(--radius-md);
-  margin-bottom: 8px;
-}
-
-.message-time {
-  font-size: 11px;
-  color: var(--text-light);
-  margin-top: 6px;
-}
-
-.message.user .message-time {
-  text-align: right;
-  color: rgba(255,255,255,0.7);
-}
-
-/* Typing Indicator */
-.typing-indicator {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 16px;
-  background: var(--bg-white);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  width: fit-content;
-  margin-top: 8px;
-}
-
-.typing-dot {
-  width: 8px;
-  height: 8px;
-  background: var(--primary);
-  border-radius: 50%;
-  animation: typing 1.4s infinite;
-}
-
-.typing-dot:nth-child(2) { animation-delay: 0.2s; }
-.typing-dot:nth-child(3) { animation-delay: 0.4s; }
-
-@keyframes typing {
-  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
-  30% { transform: translateY(-4px); opacity: 1; }
-}
-
-#typing-text {
-  font-size: 13px;
-  color: var(--text-secondary);
-}
-
-/* ===== INPUT AREA ===== */
-.input-area {
-  background: var(--bg-white);
-  border-top: 1px solid var(--border);
-  padding: 12px 16px;
-  padding-bottom: calc(12px + var(--safe-bottom));
-  transition: background 0.3s, border-color 0.3s;
-}
-
-.error-message {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 12px;
-  background: #FEE2E2;
-  border-radius: var(--radius-md);
-  margin-bottom: 12px;
-}
-
-body.dark-mode .error-message {
-  background: rgba(239, 68, 68, 0.2);
-}
-
-#error-text {
-  flex: 1;
-  font-size: 13px;
-  color: var(--error);
-}
-
-#error-close {
-  background: none;
-  border: none;
-  color: var(--error);
-  cursor: pointer;
-  font-size: 16px;
-}
-
-/* Image Preview */
-.image-preview {
-  position: relative;
-  margin-bottom: 12px;
-  display: inline-block;
-}
-
-.image-preview img {
-  max-width: 150px;
-  max-height: 100px;
-  border-radius: var(--radius-md);
-  border: 2px solid var(--border);
-}
-
-.remove-image-btn {
-  position: absolute;
-  top: -8px;
-  right: -8px;
-  width: 24px;
-  height: 24px;
-  background: var(--error);
-  color: white;
-  border: none;
-  border-radius: 50%;
-  cursor: pointer;
-  font-size: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Input Wrapper */
-.input-wrapper {
-  display: flex;
-  align-items: flex-end;
-  gap: 10px;
-  background: var(--bg-secondary);
-  border: 2px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 8px;
-  transition: border-color 0.2s, background 0.3s;
-}
-
-.input-wrapper:focus-within {
-  border-color: var(--primary);
-}
-
-/* Upload Button */
-.upload-btn {
-  width: 44px;
-  height: 44px;
-  background: var(--bg-white);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
-  flex-shrink: 0;
-  transition: background 0.2s;
-}
-
-.upload-btn:hover {
-  background: var(--primary);
-}
-
-.upload-btn:active {
-  transform: scale(0.95);
-}
-
-/* Message Input */
-#message-input {
-  flex: 1;
-  border: none;
-  background: transparent;
-  font-family: inherit;
-  font-size: 15px;
-  color: var(--text);
-  resize: none;
-  max-height: 100px;
-  min-height: 44px;
-  line-height: 1.5;
-  padding: 10px 0;
-}
-
-#message-input::placeholder {
-  color: var(--text-light);
-}
-
-#message-input:focus {
-  outline: none;
-}
-
-/* Send Button */
-.send-btn {
-  width: 44px;
-  height: 44px;
-  background: var(--primary);
-  border: none;
-  border-radius: var(--radius-md);
-  color: white;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  flex-shrink: 0;
-  transition: background 0.2s, transform 0.1s;
-}
-
-.send-btn:disabled {
-  background: var(--border);
-  cursor: not-allowed;
-}
-
-.send-btn:not(:disabled):active {
-  transform: scale(0.95);
-}
-
-/* ===== PAGE HEADER ===== */
-.page-header {
-  padding: 16px;
-  padding-top: calc(16px + var(--safe-top));
-  background: var(--bg-white);
-  border-bottom: 1px solid var(--border);
-  transition: background 0.3s, border-color 0.3s;
-}
-
-.page-header h1 {
-  font-size: 24px;
-  font-weight: 800;
-  color: var(--text);
-}
-
-.page-content {
-  flex: 1;
-  overflow-y: auto;
-  padding: 16px;
-}
-
-/* ===== SETTINGS ===== */
-.settings-section {
-  margin-bottom: 24px;
-}
-
-.settings-section h3 {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 12px;
-}
-
-.settings-options {
-  background: var(--bg-white);
-  border-radius: var(--radius-md);
-  overflow: hidden;
-  border: 1px solid var(--border);
-  transition: background 0.3s, border-color 0.3s;
-}
-
-.setting-option {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 14px 16px;
-  background: none;
-  border: none;
-  border-bottom: 1px solid var(--border);
-  cursor: pointer;
-  text-align: left;
-  transition: background 0.2s;
-  color: var(--text);
-  font-size: 15px;
-}
-
-.setting-option:last-child {
-  border-bottom: none;
-}
-
-.setting-option:active {
-  background: var(--bg-secondary);
-}
-
-.option-flag {
-  font-size: 24px;
-}
-
-.option-text {
-  flex: 1;
-  font-weight: 500;
-}
-
-.option-check {
-  font-size: 18px;
-  color: var(--primary);
-  opacity: 0;
-}
-
-.option-check.active {
-  opacity: 1;
-}
-
-.danger-btn {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 14px 20px;
-  background: var(--bg-white);
-  border: 1px solid var(--error);
-  border-radius: var(--radius-md);
-  color: var(--error);
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.3s;
-}
-
-/* ===== ABOUT ===== */
-.about-card {
-  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-  border-radius: var(--radius-lg);
-  padding: 32px;
-  text-align: center;
-  color: white;
-  margin-bottom: 24px;
-}
-
-.about-logo {
-  font-size: 64px;
-  margin-bottom: 12px;
-}
-
-.about-card h2 {
-  font-size: 28px;
-  font-weight: 800;
-}
-
-.about-card .version {
-  font-size: 14px;
-  opacity: 0.8;
-  margin-top: 4px;
-}
-
-.about-section {
-  background: var(--bg-white);
-  border-radius: var(--radius-md);
-  padding: 16px;
-  margin-bottom: 16px;
-  border: 1px solid var(--border);
-  transition: background 0.3s, border-color 0.3s;
-}
-
-.about-section h3 {
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--text);
-  margin-bottom: 8px;
-}
-
-.about-section p {
-  font-size: 14px;
-  color: var(--text-secondary);
-  line-height: 1.6;
-}
-
-.about-section ul {
-  list-style: none;
-}
-
-.about-section li {
-  font-size: 14px;
-  color: var(--text-secondary);
-  padding: 8px 0;
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.about-section li:before {
-  content: "✓";
-  color: var(--success);
-  font-weight: 700;
-}
-
-.about-section li:last-child {
-  border-bottom: none;
-}
-
-.subject-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.tag {
-  background: var(--bg-secondary);
-  color: var(--text-secondary);
-  padding: 6px 12px;
-  border-radius: var(--radius-full);
-  font-size: 13px;
-  font-weight: 500;
-}
-
-/* ===== HISTORY ===== */
-.history-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.history-item {
-  background: var(--bg-white);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: 14px 16px;
-  cursor: pointer;
-  transition: box-shadow 0.2s, background 0.3s;
-}
-
-.history-item:active {
-  box-shadow: var(--shadow-md);
-}
-
-.history-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 8px;
-}
-
-.history-status {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 12px;
-  font-weight: 600;
-  padding: 4px 10px;
-  border-radius: var(--radius-full);
-}
-
-.history-status.solved {
-  background: rgba(16, 185, 129, 0.1);
-  color: var(--success);
-}
-
-.history-status.in-progress {
-  background: rgba(245, 158, 11, 0.1);
-  color: var(--warning);
-}
-
-.history-count {
-  font-size: 12px;
-  color: var(--text-light);
-}
-
-.history-question {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text);
-  margin-bottom: 8px;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.history-meta {
-  display: flex;
-  justify-content: space-between;
-  font-size: 12px;
-  color: var(--text-light);
-}
-
-.history-subject {
-  display: inline-block;
-  background: var(--bg-secondary);
-  padding: 2px 8px;
-  border-radius: var(--radius-full);
-  font-size: 11px;
-  color: var(--text-secondary);
-  margin-top: 8px;
-}
-
-/* ===== BOTTOM NAV ===== */
-.bottom-nav {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  display: flex;
-  background: var(--bg-white);
-  border-top: 1px solid var(--border);
-  padding-bottom: var(--safe-bottom);
-  height: calc(var(--nav-height) + var(--safe-bottom));
-  z-index: 100;
-  transition: background 0.3s, border-color 0.3s;
-}
-
-.nav-item {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  padding: 10px;
-  background: none;
-  border: none;
-  color: var(--text-light);
-  cursor: pointer;
-  transition: color 0.2s;
-  font-size: 11px;
-  font-weight: 600;
-}
-
-.nav-item.active {
-  color: var(--primary);
-}
-
-.nav-icon {
-  font-size: 24px;
-}
-
-/* ===== RTL ===== */
-.rtl {
-  direction: rtl;
-}
-
-.rtl .message.user {
-  flex-direction: row;
-}
-
-.rtl .message.bot {
-  flex-direction: row-reverse;
-}
-
-.rtl #message-input {
-  text-align: right;
-}
-
-/* ===== SCROLLBAR ===== */
-::-webkit-scrollbar {
-  width: 4px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--border);
-  border-radius: 4px;
-}
+  // ===== APPLY THEME =====
+  function applyTheme(isDark) {
+    darkMode = isDark;
+    localStorage.setItem('tamrini_dark', isDark ? 'true' : 'false');
+    
+    if (isDark) {
+      document.body.classList.add('dark-mode');
+    } else {
+      document.body.classList.remove('dark-mode');
+    }
+    
+    var icon = document.getElementById('theme-icon');
+    if (icon) icon.textContent = isDark ? '☀️' : '🌙';
+    
+    var checkLight = document.getElementById('check-light');
+    var checkDark = document.getElementById('check-dark');
+    if (checkLight) checkLight.classList.toggle('active', !isDark);
+    if (checkDark) checkDark.classList.toggle('active', isDark);
+  }
+  
+  // ===== APPLY LANGUAGE =====
+  function applyLanguage(lang) {
+    currentLang = lang;
+    localStorage.setItem('tamrini_lang', lang);
+    var t = translations[lang];
+    
+    // Update text elements
+    setText('tagline', t.tagline);
+    setText('new-exercise-text', t.newExercise);
+    setText('similar-exercise-text', t.similarExercise);
+    setText('empty-title', t.emptyTitle);
+    setText('empty-desc', t.emptyDesc);
+    setText('typing-text', t.thinking);
+    setText('nav-home', t.navHome);
+    setText('nav-history', t.navHistory);
+    setText('nav-settings', t.navSettings);
+    setText('nav-about', t.navAbout);
+    setText('theme-section-title', t.themeSection);
+    setText('light-mode-text', t.lightMode);
+    setText('dark-mode-text', t.darkMode);
+    setText('lang-section-title', t.langSection);
+    setText('clear-section-title', t.clearSection);
+    setText('clear-chat-text', t.clearChat);
+    
+    var input = document.getElementById('message-input');
+    if (input) input.placeholder = t.placeholder;
+    
+    // Update language buttons
+    document.querySelectorAll('.lang-btn').forEach(function(btn) {
+      btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
+    });
+    
+    // Update language checkmarks in settings
+    document.querySelectorAll('.option-check[data-check]').forEach(function(c) {
+      c.classList.toggle('active', c.getAttribute('data-check') === lang);
+    });
+    
+    // RTL
+    document.body.classList.toggle('rtl', lang === 'ar');
+    
+    renderHistory();
+  }
+  
+  function setText(id, text) {
+    var el = document.getElementById(id);
+    if (el) el.textContent = text;
+  }
+  
+  // ===== SHOW/HIDE SIMILAR BUTTON =====
+  function showHideSimilarBtn() {
+    var btn = document.getElementById('similar-exercise-btn');
+    if (btn) {
+      if (lastExercise && messages.length >= 4) {
+        btn.classList.remove('hidden');
+      } else {
+        btn.classList.add('hidden');
+      }
+    }
+  }
+  
+  // ===== BIND EVENTS =====
+  function bindEvents() {
+    console.log('Binding events...');
+    
+    // Theme toggle button
+    var themeToggle = document.getElementById('theme-toggle');
+    if (themeToggle) {
+      themeToggle.addEventListener('click', function() {
+        console.log('Theme toggle clicked');
+        applyTheme(!darkMode);
+      });
+    }
+    
+    // Theme buttons in settings
+    var themeLightBtn = document.getElementById('theme-light-btn');
+    if (themeLightBtn) {
+      themeLightBtn.addEventListener('click', function() {
+        console.log('Light mode clicked');
+        applyTheme(false);
+      });
+    }
+    
+    var themeDarkBtn = document.getElementById('theme-dark-btn');
+    if (themeDarkBtn) {
+      themeDarkBtn.addEventListener('click', function() {
+        console.log('Dark mode clicked');
+        applyTheme(true);
+      });
+    }
+    
+    // Language buttons in header
+    document.querySelectorAll('.lang-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var lang = this.getAttribute('data-lang');
+        console.log('Language clicked:', lang);
+        applyLanguage(lang);
+      });
+    });
+    
+    // Language options in settings
+    document.querySelectorAll('.setting-option[data-lang]').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var lang = this.getAttribute('data-lang');
+        console.log('Settings language clicked:', lang);
+        applyLanguage(lang);
+      });
+    });
+    
+    // Bottom navigation
+    document.querySelectorAll('.nav-item').forEach(function(item) {
+      item.addEventListener('click', function() {
+        var page = this.getAttribute('data-page');
+        console.log('Nav clicked:', page);
+        
+        // Hide all pages
+        document.querySelectorAll('.page').forEach(function(p) {
+          p.classList.remove('active');
+        });
+        
+        // Remove active from all nav items
+        document.querySelectorAll('.nav-item').forEach(function(n) {
+          n.classList.remove('active');
+        });
+        
+        // Show selected page
+        var targetPage = document.getElementById('page-' + page);
+        if (targetPage) {
+          targetPage.classList.add('active');
+        }
+        
+        // Activate nav item
+        this.classList.add('active');
+      });
+    });
+    
+    // New Exercise button
+    var newExBtn = document.getElementById('new-exercise-btn');
+    if (newExBtn) {
+      newExBtn.addEventListener('click', function() {
+        console.log('New Exercise clicked');
+        messages = [];
+        lastExercise = '';
+        selectedImage = null;
+        localStorage.setItem('tamrini_messages', '[]');
+        localStorage.setItem('tamrini_exercise', '');
+        hideImagePreview();
+        renderMessages();
+        showHideSimilarBtn();
+        addMessage('bot', translations[currentLang].newGreeting);
+        document.getElementById('message-input').focus();
+      });
+    }
+    
+    // Similar Exercise button
+    var similarBtn = document.getElementById('similar-exercise-btn');
+    if (similarBtn) {
+      similarBtn.addEventListener('click', function() {
+        console.log('Similar Exercise clicked');
+        if (!lastExercise || isLoading) return;
+        messages = [];
+        localStorage.setItem('tamrini_messages', '[]');
+        renderMessages();
+        addMessage('bot', '🎯 ' + translations[currentLang].similarExercise + '...');
+        callAPI("Generate a similar exercise to: " + lastExercise, true);
+      });
+    }
+    
+    // Clear Chat button
+    var clearBtn = document.getElementById('clear-chat-btn');
+    if (clearBtn) {
+      clearBtn.addEventListener('click', function() {
+        console.log('Clear chat clicked');
+        if (confirm('Clear all history?')) {
+          messages = [];
+          history = [];
+          lastExercise = '';
+          localStorage.setItem('tamrini_messages', '[]');
+          localStorage.setItem('tamrini_history', '[]');
+          localStorage.setItem('tamrini_exercise', '');
+          renderMessages();
+          renderHistory();
+          showHideSimilarBtn();
+        }
+      });
+    }
+    
+    // Upload button
+    var uploadBtn = document.getElementById('upload-btn');
+    var imageInput = document.getElementById('image-input');
+    if (uploadBtn && imageInput) {
+      uploadBtn.addEventListener('click', function() {
+        console.log('Upload clicked');
+        imageInput.click();
+      });
+      
+      imageInput.addEventListener('change', function(e) {
+        var file = e.target.files[0];
+        if (file) {
+          console.log('Image selected:', file.name);
+          var reader = new FileReader();
+          reader.onload = function(ev) {
+            selectedImage = ev.target.result;
+            showImagePreview(selectedImage);
+            document.getElementById('send-btn').disabled = false;
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+    }
+    
+    // Remove image button
+    var removeImgBtn = document.getElementById('remove-image');
+    if (removeImgBtn) {
+      removeImgBtn.addEventListener('click', function() {
+        console.log('Remove image clicked');
+        hideImagePreview();
+      });
+    }
+    
+    // Message input
+    var msgInput = document.getElementById('message-input');
+    var sendBtn = document.getElementById('send-btn');
+    
+    if (msgInput) {
+      msgInput.addEventListener('input', function() {
+        var hasText = this.value.trim().length > 0;
+        var hasImage = selectedImage !== null;
+        sendBtn.disabled = (!hasText && !hasImage) || isLoading;
+        
+        // Auto resize
+        this.style.height = 'auto';
+        this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+      });
+      
+      msgInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          sendMessage();
+        }
+      });
+    }
+    
+    // Send button
+    if (sendBtn) {
+      sendBtn.addEventListener('click', function() {
+        console.log('Send clicked');
+        sendMessage();
+      });
+    }
+    
+    // Error close
+    var errorClose = document.getElementById('error-close');
+    if (errorClose) {
+      errorClose.addEventListener('click', function() {
+        document.getElementById('error').classList.add('hidden');
+      });
+    }
+    
+    console.log('Events bound!');
+  }
+  
+  // ===== IMAGE PREVIEW =====
+  function showImagePreview(src) {
+    var preview = document.getElementById('image-preview');
+    var img = document.getElementById('preview-img');
+    if (preview && img) {
+      img.src = src;
+      preview.classList.remove('hidden');
+    }
+  }
+  
+  function hideImagePreview() {
+    selectedImage = null;
+    var preview = document.getElementById('image-preview');
+    var input = document.getElementById('image-input');
+    if (preview) preview.classList.add('hidden');
+    if (input) input.value = '';
+    
+    var msgInput = document.getElementById('message-input');
+    var sendBtn = document.getElementById('send-btn');
+    if (sendBtn && msgInput) {
+      sendBtn.disabled = !msgInput.value.trim();
+    }
+  }
+  
+  // ===== RENDER MESSAGES =====
+  function renderMessages() {
+    var container = document.getElementById('messages');
+    var empty = document.getElementById('empty-state');
+    
+    if (!container) return;
+    
+    container.innerHTML = '';
+    
+    if (messages.length === 0) {
+      if (empty) empty.classList.remove('hidden');
+    } else {
+      if (empty) empty.classList.add('hidden');
+      messages.forEach(function(msg) {
+        container.appendChild(createMessageElement(msg));
+      });
+      scrollToBottom();
+    }
+  }
+  
+  function createMessageElement(msg) {
+    var div = document.createElement('div');
+    div.className = 'message ' + (msg.role === 'user' ? 'user' : 'bot');
+    
+    var avatar = msg.role === 'user' ? '👤' : '📐';
+    var content = '';
+    
+    if (msg.image) {
+      content += '<img class="message-image" src="' + msg.image + '">';
+    }
+    
+    var text = (msg.content || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/\n/g, '<br>');
+    
+    content += '<div class="message-text">' + text + '</div>';
+    content += '<div class="message-time">' + (msg.time || '') + '</div>';
+    
+    div.innerHTML = '<div class="message-avatar">' + avatar + '</div>' +
+                    '<div class="message-bubble">' + content + '</div>';
+    
+    return div;
+  }
+  
+  // ===== ADD MESSAGE =====
+  function addMessage(role, content, image) {
+    var time = new Date().toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
+    var msg = {role: role, content: content, time: time};
+    if (image) msg.image = image;
+    
+    messages.push(msg);
+    localStorage.setItem('tamrini_messages', JSON.stringify(messages));
+    
+    var empty = document.getElementById('empty-state');
+    if (empty) empty.classList.add('hidden');
+    
+    var container = document.getElementById('messages');
+    if (container) {
+      container.appendChild(createMessageElement(msg));
+      scrollToBottom();
+    }
+    
+    // Save to history
+    if (role === 'user' && messages.length <= 2) {
+      lastExercise = content || 'Image exercise';
+      localStorage.setItem('tamrini_exercise', lastExercise);
+      saveToHistory(content || 'Image exercise', image);
+    }
+    
+    showHideSimilarBtn();
+  }
+  
+  function scrollToBottom() {
+    var container = document.getElementById('chat-container');
+    if (container) {
+      container.scrollTop = container.scrollHeight;
+    }
+  }
+  
+  // ===== HISTORY =====
+  function saveToHistory(question, image) {
+    var item = {
+      id: Date.now(),
+      question: question.substring(0, 80),
+      image: image || null,
+      date: new Date().toLocaleDateString(),
+      time: new Date().toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}),
+      count: 1,
+      status: 'progress',
+      subject: getSubject(question)
+    };
+    
+    history.unshift(item);
+    if (history.length > 20) history.pop();
+    localStorage.setItem('tamrini_history', JSON.stringify(history));
+    renderHistory();
+  }
+  
+  function getSubject(q) {
+    q = q.toLowerCase();
+    if (q.includes('triangle') || q.includes('angle') || q.includes('circle')) return '📐 Geometry';
+    if (q.includes('deriv') || q.includes('integral')) return '📈 Calculus';
+    if (q.includes('probab') || q.includes('mean')) return '📊 Statistics';
+    return '🔢 Algebra';
+  }
+  
+  function renderHistory() {
+    var container = document.getElementById('history-list');
+    var empty = document.getElementById('history-empty');
+    var t = translations[currentLang];
+    
+    if (!container) return;
+    
+    if (history.length === 0) {
+      if (empty) empty.classList.remove('hidden');
+      container.innerHTML = '';
+    } else {
+      if (empty) empty.classList.add('hidden');
+      
+      var html = '';
+      history.forEach(function(item) {
+        var statusClass = item.status === 'solved' ? 'solved' : 'in-progress';
+        var statusText = item.status === 'solved' ? t.solved : t.inProgress;
+        var statusIcon = item.status === 'solved' ? '✓' : '⏳';
+        
+        html += '<div class="history-item">' +
+          '<div class="history-header">' +
+            '<span class="history-status ' + statusClass + '">' + statusIcon + ' ' + statusText + '</span>' +
+            '<span class="history-count">' + (item.count || 1) + ' ' + t.msgs + '</span>' +
+          '</div>' +
+          '<div class="history-question">' + item.question + '</div>' +
+          '<div class="history-meta"><span>' + item.date + '</span><span>' + item.time + '</span></div>' +
+          '<span class="history-subject">' + (item.subject || '🔢 Algebra') + '</span>' +
+        '</div>';
+      });
+      
+      container.innerHTML = html;
+    }
+  }
+  
+  function updateHistoryStatus() {
+    if (history.length > 0 && messages.length >= 6) {
+      history[0].status = 'solved';
+      history[0].count = messages.length;
+      localStorage.setItem('tamrini_history', JSON.stringify(history));
+      renderHistory();
+    }
+  }
+  
+  // ===== SEND MESSAGE =====
+  function sendMessage() {
+    var input = document.getElementById('message-input');
+    var text = input.value.trim();
+    
+    if ((!text && !selectedImage) || isLoading) return;
+    
+    addMessage('user', text, selectedImage);
+    
+    input.value = '';
+    input.style.height = 'auto';
+    document.getElementById('send-btn').disabled = true;
+    
+    var imageToSend = selectedImage;
+    hideImagePreview();
+    
+    callAPI(text || 'Please help me with this exercise image', false, imageToSend);
+  }
+  
+  // ===== CALL API =====
+  function callAPI(text, isSimilar, image) {
+    isLoading = true;
+    
+    var typing = document.getElementById('typing');
+    if (typing) typing.classList.remove('hidden');
+    
+    var error = document.getElementById('error');
+    if (error) error.classList.add('hidden');
+    
+    scrollToBottom();
+    
+    var chatHistory = messages.slice(-10).map(function(m) {
+      return {
+        role: m.role === 'bot' ? 'assistant' : 'user',
+        content: m.content
+      };
+    });
+    
+    var body = {
+      question: text,
+      language: currentLang,
+      history: chatHistory
+    };
+    
+    if (image) body.image = image;
+    
+    fetch(API_URL, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(body)
+    })
+    .then(function(response) {
+      return response.json();
+    })
+    .then(function(data) {
+      console.log('API Response:', data);
+      
+      if (data.error) {
+        throw new Error(data.details || data.error);
+      }
+      
+      addMessage('bot', data.reply);
+      updateHistoryStatus();
+      
+      if (isSimilar && data.reply) {
+        lastExercise = data.reply.split('\n')[0];
+        localStorage.setItem('tamrini_exercise', lastExercise);
+      }
+    })
+    .catch(function(err) {
+      console.error('API Error:', err);
+      var t = translations[currentLang];
+      var errorText = document.getElementById('error-text');
+      if (errorText) {
+        errorText.textContent = err.message.includes('quota') ? t.quotaError : t.error;
+      }
+      var errorEl = document.getElementById('error');
+      if (errorEl) errorEl.classList.remove('hidden');
+    })
+    .finally(function() {
+      isLoading = false;
+      var typing = document.getElementById('typing');
+      if (typing) typing.classList.add('hidden');
+      
+      var input = document.getElementById('message-input');
+      var sendBtn = document.getElementById('send-btn');
+      if (input && sendBtn) {
+        sendBtn.disabled = !input.value.trim() && !selectedImage;
+      }
+    });
+  }
+});
