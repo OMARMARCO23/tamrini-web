@@ -11,7 +11,6 @@ document.addEventListener('DOMContentLoaded', function() {
   var isLoading = false;
   var lastExercise = '';
   var selectedImage = null;
-  var conversationImage = null; // Store image for entire conversation
   
   var API_URL = 'https://tamarini-app.vercel.app/api/chat';
   
@@ -26,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function() {
       placeholder: "Type your math question...",
       thinking: "Thinking...",
       error: "Something went wrong. Please try again.",
-      quotaError: "Too many requests. Please wait a moment.",
+      quotaError: "Too many requests. Please wait 30 seconds.",
       navHome: "Home",
       navHistory: "History",
       navSettings: "Settings",
@@ -52,7 +51,7 @@ document.addEventListener('DOMContentLoaded', function() {
       placeholder: "Écris ta question de maths...",
       thinking: "Je réfléchis...",
       error: "Erreur. Réessaie.",
-      quotaError: "Trop de demandes. Attends.",
+      quotaError: "Trop de demandes. Attends 30 secondes.",
       navHome: "Accueil",
       navHistory: "Historique",
       navSettings: "Paramètres",
@@ -78,7 +77,7 @@ document.addEventListener('DOMContentLoaded', function() {
       placeholder: "اكتب سؤالك...",
       thinking: "أفكر...",
       error: "حدث خطأ. حاول مرة أخرى.",
-      quotaError: "طلبات كثيرة. انتظر.",
+      quotaError: "طلبات كثيرة. انتظر 30 ثانية.",
       navHome: "الرئيسية",
       navHistory: "السجل",
       navSettings: "الإعدادات",
@@ -105,8 +104,6 @@ document.addEventListener('DOMContentLoaded', function() {
     if (s2) history = JSON.parse(s2);
     var s3 = localStorage.getItem('tamrini_exercise');
     if (s3) lastExercise = s3;
-    var s4 = localStorage.getItem('tamrini_conv_image');
-    if (s4) conversationImage = s4;
   } catch(e) {
     console.log('Load error:', e);
   }
@@ -176,7 +173,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     document.body.classList.toggle('rtl', lang === 'ar');
-    
     renderHistory();
   }
   
@@ -201,11 +197,10 @@ document.addEventListener('DOMContentLoaded', function() {
   function bindEvents() {
     console.log('Binding events...');
     
-    // Theme toggle button
+    // Theme toggle
     var themeToggle = document.getElementById('theme-toggle');
     if (themeToggle) {
       themeToggle.addEventListener('click', function() {
-        console.log('Theme toggle clicked');
         applyTheme(!darkMode);
       });
     }
@@ -214,7 +209,6 @@ document.addEventListener('DOMContentLoaded', function() {
     var themeLightBtn = document.getElementById('theme-light-btn');
     if (themeLightBtn) {
       themeLightBtn.addEventListener('click', function() {
-        console.log('Light mode clicked');
         applyTheme(false);
       });
     }
@@ -222,26 +216,21 @@ document.addEventListener('DOMContentLoaded', function() {
     var themeDarkBtn = document.getElementById('theme-dark-btn');
     if (themeDarkBtn) {
       themeDarkBtn.addEventListener('click', function() {
-        console.log('Dark mode clicked');
         applyTheme(true);
       });
     }
     
-    // Language buttons in header
+    // Language buttons
     document.querySelectorAll('.lang-btn').forEach(function(btn) {
       btn.addEventListener('click', function() {
-        var lang = this.getAttribute('data-lang');
-        console.log('Language clicked:', lang);
-        applyLanguage(lang);
+        applyLanguage(this.getAttribute('data-lang'));
       });
     });
     
     // Language options in settings
     document.querySelectorAll('.setting-option[data-lang]').forEach(function(btn) {
       btn.addEventListener('click', function() {
-        var lang = this.getAttribute('data-lang');
-        console.log('Settings language clicked:', lang);
-        applyLanguage(lang);
+        applyLanguage(this.getAttribute('data-lang'));
       });
     });
     
@@ -249,7 +238,6 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.nav-item').forEach(function(item) {
       item.addEventListener('click', function() {
         var page = this.getAttribute('data-page');
-        console.log('Nav clicked:', page);
         
         document.querySelectorAll('.page').forEach(function(p) {
           p.classList.remove('active');
@@ -260,10 +248,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         var targetPage = document.getElementById('page-' + page);
-        if (targetPage) {
-          targetPage.classList.add('active');
-        }
-        
+        if (targetPage) targetPage.classList.add('active');
         this.classList.add('active');
       });
     });
@@ -276,15 +261,14 @@ document.addEventListener('DOMContentLoaded', function() {
         messages = [];
         lastExercise = '';
         selectedImage = null;
-        conversationImage = null; // Clear conversation image
         localStorage.setItem('tamrini_messages', '[]');
         localStorage.setItem('tamrini_exercise', '');
-        localStorage.removeItem('tamrini_conv_image');
         hideImagePreview();
         renderMessages();
         showHideSimilarBtn();
         addMessage('bot', translations[currentLang].newGreeting);
-        document.getElementById('message-input').focus();
+        var input = document.getElementById('message-input');
+        if (input) input.focus();
       });
     }
     
@@ -295,9 +279,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Similar Exercise clicked');
         if (!lastExercise || isLoading) return;
         messages = [];
-        conversationImage = null;
         localStorage.setItem('tamrini_messages', '[]');
-        localStorage.removeItem('tamrini_conv_image');
         renderMessages();
         addMessage('bot', '🎯 ' + translations[currentLang].similarExercise + '...');
         callAPI("Generate a similar exercise to: " + lastExercise, true, null);
@@ -308,16 +290,13 @@ document.addEventListener('DOMContentLoaded', function() {
     var clearBtn = document.getElementById('clear-chat-btn');
     if (clearBtn) {
       clearBtn.addEventListener('click', function() {
-        console.log('Clear chat clicked');
         if (confirm('Clear all history?')) {
           messages = [];
           history = [];
           lastExercise = '';
-          conversationImage = null;
           localStorage.setItem('tamrini_messages', '[]');
           localStorage.setItem('tamrini_history', '[]');
           localStorage.setItem('tamrini_exercise', '');
-          localStorage.removeItem('tamrini_conv_image');
           renderMessages();
           renderHistory();
           showHideSimilarBtn();
@@ -353,7 +332,6 @@ document.addEventListener('DOMContentLoaded', function() {
     var removeImgBtn = document.getElementById('remove-image');
     if (removeImgBtn) {
       removeImgBtn.addEventListener('click', function() {
-        console.log('Remove image clicked');
         hideImagePreview();
       });
     }
@@ -366,7 +344,7 @@ document.addEventListener('DOMContentLoaded', function() {
       msgInput.addEventListener('input', function() {
         var hasText = this.value.trim().length > 0;
         var hasImage = selectedImage !== null;
-        sendBtn.disabled = (!hasText && !hasImage) || isLoading;
+        if (sendBtn) sendBtn.disabled = (!hasText && !hasImage) || isLoading;
         
         this.style.height = 'auto';
         this.style.height = Math.min(this.scrollHeight, 100) + 'px';
@@ -383,7 +361,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Send button
     if (sendBtn) {
       sendBtn.addEventListener('click', function() {
-        console.log('Send clicked');
         sendMessage();
       });
     }
@@ -508,7 +485,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var item = {
       id: Date.now(),
       question: question.substring(0, 80),
-      image: image ? true : false,
+      hasImage: !!image,
       date: new Date().toLocaleDateString(),
       time: new Date().toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}),
       count: 1,
@@ -523,7 +500,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   
   function getSubject(q) {
-    q = q.toLowerCase();
+    q = (q || '').toLowerCase();
     if (q.includes('triangle') || q.includes('angle') || q.includes('circle')) return '📐 Geometry';
     if (q.includes('deriv') || q.includes('integral')) return '📈 Calculus';
     if (q.includes('probab') || q.includes('mean')) return '📊 Statistics';
@@ -548,14 +525,14 @@ document.addEventListener('DOMContentLoaded', function() {
         var statusClass = item.status === 'solved' ? 'solved' : 'in-progress';
         var statusText = item.status === 'solved' ? t.solved : t.inProgress;
         var statusIcon = item.status === 'solved' ? '✓' : '⏳';
-        var hasImageIcon = item.image ? '📷 ' : '';
+        var imageIcon = item.hasImage ? '📷 ' : '';
         
         html += '<div class="history-item">' +
           '<div class="history-header">' +
             '<span class="history-status ' + statusClass + '">' + statusIcon + ' ' + statusText + '</span>' +
             '<span class="history-count">' + (item.count || 1) + ' ' + t.msgs + '</span>' +
           '</div>' +
-          '<div class="history-question">' + hasImageIcon + item.question + '</div>' +
+          '<div class="history-question">' + imageIcon + item.question + '</div>' +
           '<div class="history-meta"><span>' + item.date + '</span><span>' + item.time + '</span></div>' +
           '<span class="history-subject">' + (item.subject || '🔢 Algebra') + '</span>' +
         '</div>';
@@ -581,22 +558,22 @@ document.addEventListener('DOMContentLoaded', function() {
     
     if ((!text && !selectedImage) || isLoading) return;
     
-    // If this is the first message with an image, store it for the conversation
-    if (selectedImage && !conversationImage) {
-      conversationImage = selectedImage;
-      localStorage.setItem('tamrini_conv_image', conversationImage);
-    }
+    console.log('Sending message...');
     
+    // Add user message to chat
     addMessage('user', text, selectedImage);
     
+    // Clear input
     input.value = '';
     input.style.height = 'auto';
     document.getElementById('send-btn').disabled = true;
     
-    var imageToSend = selectedImage || conversationImage;
+    // Only send image if user just uploaded one (not every message)
+    var imageToSend = selectedImage;
+    
     hideImagePreview();
     
-    callAPI(text || 'Aide-moi avec cet exercice', false, imageToSend);
+    callAPI(text || 'Help me with this exercise', false, imageToSend);
   }
   
   // ===== CALL API =====
@@ -611,10 +588,11 @@ document.addEventListener('DOMContentLoaded', function() {
     
     scrollToBottom();
     
-    var chatHistory = messages.slice(-8).map(function(m) {
+    // Build short history (only last 4 messages to save tokens)
+    var chatHistory = messages.slice(-4).map(function(m) {
       return {
         role: m.role === 'bot' ? 'assistant' : 'user',
-        content: m.content
+        content: (m.content || '').substring(0, 150) // Truncate long messages
       };
     });
     
@@ -624,10 +602,10 @@ document.addEventListener('DOMContentLoaded', function() {
       history: chatHistory
     };
     
-    // Always send image if we have one for this conversation
+    // Only include image if provided
     if (image) {
       body.image = image;
-      console.log('Sending with image, length:', image.length);
+      console.log('Sending with image');
     }
     
     fetch(API_URL, {
@@ -640,7 +618,6 @@ document.addEventListener('DOMContentLoaded', function() {
     })
     .then(function(data) {
       console.log('API Response:', data);
-      console.log('Reply:', data.reply);
       
       if (data.error) {
         throw new Error(data.details || data.error);
@@ -659,7 +636,11 @@ document.addEventListener('DOMContentLoaded', function() {
       var t = translations[currentLang];
       var errorText = document.getElementById('error-text');
       if (errorText) {
-        errorText.textContent = err.message.includes('quota') ? t.quotaError : t.error;
+        if (err.message.includes('quota') || err.message.includes('limit')) {
+          errorText.textContent = t.quotaError;
+        } else {
+          errorText.textContent = t.error;
+        }
       }
       var errorEl = document.getElementById('error');
       if (errorEl) errorEl.classList.remove('hidden');
