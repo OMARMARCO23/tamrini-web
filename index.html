@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <meta name="theme-color" content="#4F46E5">
+  <meta name="theme-color" content="#4F46E5" id="theme-color-meta">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="description" content="Tamrini - AI Math Tutor for Students">
@@ -35,6 +35,9 @@
         </div>
       </div>
       <div class="header-right">
+        <button id="theme-toggle" class="theme-toggle" title="Toggle dark mode">
+          <span class="theme-icon" id="theme-icon">🌙</span>
+        </button>
         <div class="lang-switcher">
           <button class="lang-btn active" data-lang="en">EN</button>
           <button class="lang-btn" data-lang="fr">FR</button>
@@ -84,7 +87,24 @@
         <span id="error-text"></span>
         <button id="error-close">✕</button>
       </div>
+      
+      <!-- Image Preview -->
+      <div id="image-preview" class="image-preview hidden">
+        <img id="preview-img" src="" alt="Exercise image">
+        <button id="remove-image" class="remove-image-btn">✕</button>
+      </div>
+      
       <div class="input-wrapper">
+        <!-- Image Upload Button -->
+        <button id="upload-btn" class="upload-btn" title="Upload image">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+            <circle cx="8.5" cy="8.5" r="1.5"/>
+            <polyline points="21 15 16 10 5 21"/>
+          </svg>
+        </button>
+        <input type="file" id="image-input" accept="image/*" class="hidden-input">
+        
         <textarea 
           id="message-input" 
           placeholder="Type your math question..."
@@ -106,6 +126,23 @@
       <h1 id="settings-title">Settings</h1>
     </header>
     <div class="page-content">
+      
+      <!-- Theme Section -->
+      <div class="settings-section">
+        <h3 id="theme-section-title">Appearance</h3>
+        <div class="settings-options">
+          <button class="setting-option" id="theme-light-btn" data-theme="light">
+            <span class="option-flag">☀️</span>
+            <span class="option-text" id="light-mode-text">Light Mode</span>
+            <span class="option-check" data-check-theme="light">✓</span>
+          </button>
+          <button class="setting-option" id="theme-dark-btn" data-theme="dark">
+            <span class="option-flag">🌙</span>
+            <span class="option-text" id="dark-mode-text">Dark Mode</span>
+            <span class="option-check" data-check-theme="dark">✓</span>
+          </button>
+        </div>
+      </div>
       
       <div class="settings-section">
         <h3 id="lang-section-title">Language</h3>
@@ -160,7 +197,7 @@
       <div class="about-section">
         <h3 id="how-works-title">How it Works</h3>
         <ul id="how-works-list">
-          <li>Ask any math question</li>
+          <li>Ask any math question or upload an image</li>
           <li>Tamrini asks guiding questions</li>
           <li>You think and respond</li>
           <li>Learn by understanding, not memorizing</li>
