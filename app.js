@@ -11,6 +11,9 @@ document.addEventListener('DOMContentLoaded', function() {
   var isLoading = false;
   var lastExercise = '';
   var selectedImage = null;
+
+  // simple frontend cooldown after a quota error (in ms timestamp)
+  var rateLimitUntil = 0;
   
   var API_URL = 'https://tamarini-app.vercel.app/api/chat';
   
@@ -554,6 +557,8 @@ document.addEventListener('DOMContentLoaded', function() {
   // ===== SEND MESSAGE =====
   function sendMessage() {
     var input = document.getElementById('message-input');
+    if (!input) return;
+
     var text = input.value.trim();
     
     if ((!text && !selectedImage) || isLoading) return;
@@ -578,6 +583,16 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // ===== CALL API =====
   function callAPI(text, isSimilar, image) {
+    // frontend cooldown: if we recently hit quota, avoid hammering for 30s
+    if (Date.now() < rateLimitUntil) {
+      var tCool = translations[currentLang];
+      var errorTextCool = document.getElementById('error-text');
+      var errorElCool = document.getElementById('error');
+      if (errorTextCool) errorTextCool.textContent = tCool.quotaError;
+      if (errorElCool) errorElCool.classList.remove('hidden');
+      return;
+    }
+
     isLoading = true;
     
     var typing = document.getElementById('typing');
@@ -614,15 +629,30 @@ document.addEventListener('DOMContentLoaded', function() {
       body: JSON.stringify(body)
     })
     .then(function(response) {
-      return response.json();
+      // Parse JSON, but always keep status
+      return response.json()
+        .catch(function(parseErr) {
+          console.error('Failed to parse API response as JSON', parseErr);
+          var err = new Error('Invalid server response');
+          err.status = response.status;
+          throw err;
+        })
+        .then(function(data) {
+          console.log('API Response:', data);
+          
+          // If backend returned non-2xx, or an error field, treat as error
+          if (!response.ok || data.error) {
+            var message = data.details || data.error || 'API error';
+            var err = new Error(message);
+            err.status = response.status;
+            err.code = data.code || data.geminiStatus;
+            throw err;
+          }
+          
+          return data;
+        });
     })
     .then(function(data) {
-      console.log('API Response:', data);
-      
-      if (data.error) {
-        throw new Error(data.details || data.error);
-      }
-      
       addMessage('bot', data.reply);
       updateHistoryStatus();
       
@@ -635,14 +665,24 @@ document.addEventListener('DOMContentLoaded', function() {
       console.error('API Error:', err);
       var t = translations[currentLang];
       var errorText = document.getElementById('error-text');
+      var errorEl = document.getElementById('error');
+
+      var msg = (err.message || '').toLowerCase();
+      var isQuotaError = (err.status === 429) ||
+                         msg.includes('quota') ||
+                         msg.includes('too many requests') ||
+                         msg.includes('rate limit') ||
+                         msg.includes('limit');
+
       if (errorText) {
-        if (err.message.includes('quota') || err.message.includes('limit')) {
+        if (isQuotaError) {
           errorText.textContent = t.quotaError;
+          // set frontend cooldown for ~35 seconds
+          rateLimitUntil = Date.now() + 35000;
         } else {
           errorText.textContent = t.error;
         }
       }
-      var errorEl = document.getElementById('error');
       if (errorEl) errorEl.classList.remove('hidden');
     })
     .finally(function() {
