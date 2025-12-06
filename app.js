@@ -629,7 +629,7 @@ document.addEventListener('DOMContentLoaded', function() {
       return response.json();
     })
     .then(function(data) {
-      console.log('API Response:', data);
+      console.log('API Response:', JSON.stringify(data, null, 2));
       
       if (data.error) {
         throw new Error(data.details || data.error);
