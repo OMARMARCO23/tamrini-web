@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
   var isLoading = false;
   var lastExercise = '';
   var selectedImage = null;
+  var conversationImage = null; // Store image for entire conversation
   
   var API_URL = 'https://tamarini-app.vercel.app/api/chat';
   
@@ -104,6 +105,8 @@ document.addEventListener('DOMContentLoaded', function() {
     if (s2) history = JSON.parse(s2);
     var s3 = localStorage.getItem('tamrini_exercise');
     if (s3) lastExercise = s3;
+    var s4 = localStorage.getItem('tamrini_conv_image');
+    if (s4) conversationImage = s4;
   } catch(e) {
     console.log('Load error:', e);
   }
@@ -144,7 +147,6 @@ document.addEventListener('DOMContentLoaded', function() {
     localStorage.setItem('tamrini_lang', lang);
     var t = translations[lang];
     
-    // Update text elements
     setText('tagline', t.tagline);
     setText('new-exercise-text', t.newExercise);
     setText('similar-exercise-text', t.similarExercise);
@@ -165,17 +167,14 @@ document.addEventListener('DOMContentLoaded', function() {
     var input = document.getElementById('message-input');
     if (input) input.placeholder = t.placeholder;
     
-    // Update language buttons
     document.querySelectorAll('.lang-btn').forEach(function(btn) {
       btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
     });
     
-    // Update language checkmarks in settings
     document.querySelectorAll('.option-check[data-check]').forEach(function(c) {
       c.classList.toggle('active', c.getAttribute('data-check') === lang);
     });
     
-    // RTL
     document.body.classList.toggle('rtl', lang === 'ar');
     
     renderHistory();
@@ -252,23 +251,19 @@ document.addEventListener('DOMContentLoaded', function() {
         var page = this.getAttribute('data-page');
         console.log('Nav clicked:', page);
         
-        // Hide all pages
         document.querySelectorAll('.page').forEach(function(p) {
           p.classList.remove('active');
         });
         
-        // Remove active from all nav items
         document.querySelectorAll('.nav-item').forEach(function(n) {
           n.classList.remove('active');
         });
         
-        // Show selected page
         var targetPage = document.getElementById('page-' + page);
         if (targetPage) {
           targetPage.classList.add('active');
         }
         
-        // Activate nav item
         this.classList.add('active');
       });
     });
@@ -281,8 +276,10 @@ document.addEventListener('DOMContentLoaded', function() {
         messages = [];
         lastExercise = '';
         selectedImage = null;
+        conversationImage = null; // Clear conversation image
         localStorage.setItem('tamrini_messages', '[]');
         localStorage.setItem('tamrini_exercise', '');
+        localStorage.removeItem('tamrini_conv_image');
         hideImagePreview();
         renderMessages();
         showHideSimilarBtn();
@@ -298,10 +295,12 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Similar Exercise clicked');
         if (!lastExercise || isLoading) return;
         messages = [];
+        conversationImage = null;
         localStorage.setItem('tamrini_messages', '[]');
+        localStorage.removeItem('tamrini_conv_image');
         renderMessages();
         addMessage('bot', '🎯 ' + translations[currentLang].similarExercise + '...');
-        callAPI("Generate a similar exercise to: " + lastExercise, true);
+        callAPI("Generate a similar exercise to: " + lastExercise, true, null);
       });
     }
     
@@ -314,9 +313,11 @@ document.addEventListener('DOMContentLoaded', function() {
           messages = [];
           history = [];
           lastExercise = '';
+          conversationImage = null;
           localStorage.setItem('tamrini_messages', '[]');
           localStorage.setItem('tamrini_history', '[]');
           localStorage.setItem('tamrini_exercise', '');
+          localStorage.removeItem('tamrini_conv_image');
           renderMessages();
           renderHistory();
           showHideSimilarBtn();
@@ -367,7 +368,6 @@ document.addEventListener('DOMContentLoaded', function() {
         var hasImage = selectedImage !== null;
         sendBtn.disabled = (!hasText && !hasImage) || isLoading;
         
-        // Auto resize
         this.style.height = 'auto';
         this.style.height = Math.min(this.scrollHeight, 100) + 'px';
       });
@@ -487,7 +487,6 @@ document.addEventListener('DOMContentLoaded', function() {
       scrollToBottom();
     }
     
-    // Save to history
     if (role === 'user' && messages.length <= 2) {
       lastExercise = content || 'Image exercise';
       localStorage.setItem('tamrini_exercise', lastExercise);
@@ -509,7 +508,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var item = {
       id: Date.now(),
       question: question.substring(0, 80),
-      image: image || null,
+      image: image ? true : false,
       date: new Date().toLocaleDateString(),
       time: new Date().toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}),
       count: 1,
@@ -549,13 +548,14 @@ document.addEventListener('DOMContentLoaded', function() {
         var statusClass = item.status === 'solved' ? 'solved' : 'in-progress';
         var statusText = item.status === 'solved' ? t.solved : t.inProgress;
         var statusIcon = item.status === 'solved' ? '✓' : '⏳';
+        var hasImageIcon = item.image ? '📷 ' : '';
         
         html += '<div class="history-item">' +
           '<div class="history-header">' +
             '<span class="history-status ' + statusClass + '">' + statusIcon + ' ' + statusText + '</span>' +
             '<span class="history-count">' + (item.count || 1) + ' ' + t.msgs + '</span>' +
           '</div>' +
-          '<div class="history-question">' + item.question + '</div>' +
+          '<div class="history-question">' + hasImageIcon + item.question + '</div>' +
           '<div class="history-meta"><span>' + item.date + '</span><span>' + item.time + '</span></div>' +
           '<span class="history-subject">' + (item.subject || '🔢 Algebra') + '</span>' +
         '</div>';
@@ -581,16 +581,22 @@ document.addEventListener('DOMContentLoaded', function() {
     
     if ((!text && !selectedImage) || isLoading) return;
     
+    // If this is the first message with an image, store it for the conversation
+    if (selectedImage && !conversationImage) {
+      conversationImage = selectedImage;
+      localStorage.setItem('tamrini_conv_image', conversationImage);
+    }
+    
     addMessage('user', text, selectedImage);
     
     input.value = '';
     input.style.height = 'auto';
     document.getElementById('send-btn').disabled = true;
     
-    var imageToSend = selectedImage;
+    var imageToSend = selectedImage || conversationImage;
     hideImagePreview();
     
-    callAPI(text || 'Please help me with this exercise image', false, imageToSend);
+    callAPI(text || 'Aide-moi avec cet exercice', false, imageToSend);
   }
   
   // ===== CALL API =====
@@ -605,7 +611,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     scrollToBottom();
     
-    var chatHistory = messages.slice(-10).map(function(m) {
+    var chatHistory = messages.slice(-8).map(function(m) {
       return {
         role: m.role === 'bot' ? 'assistant' : 'user',
         content: m.content
@@ -618,20 +624,23 @@ document.addEventListener('DOMContentLoaded', function() {
       history: chatHistory
     };
     
-    if (image) body.image = image;
+    // Always send image if we have one for this conversation
+    if (image) {
+      body.image = image;
+      console.log('Sending with image, length:', image.length);
+    }
     
     fetch(API_URL, {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(body)
     })
-     
     .then(function(response) {
-      console.log('=== API RESPONSE ===');
-      console.log('Full data:', data);
+      return response.json();
+    })
+    .then(function(data) {
+      console.log('API Response:', data);
       console.log('Reply:', data.reply);
-      console.log('Error:', data.error);
-      console.log('====================');
       
       if (data.error) {
         throw new Error(data.details || data.error);
@@ -645,7 +654,6 @@ document.addEventListener('DOMContentLoaded', function() {
         localStorage.setItem('tamrini_exercise', lastExercise);
       }
     })
-      
     .catch(function(err) {
       console.error('API Error:', err);
       var t = translations[currentLang];
