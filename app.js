@@ -625,11 +625,13 @@ document.addEventListener('DOMContentLoaded', function() {
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(body)
     })
+     
     .then(function(response) {
-      return response.json();
-    })
-    .then(function(data) {
-      console.log('API Response:', JSON.stringify(data, null, 2));
+      console.log('=== API RESPONSE ===');
+      console.log('Full data:', data);
+      console.log('Reply:', data.reply);
+      console.log('Error:', data.error);
+      console.log('====================');
       
       if (data.error) {
         throw new Error(data.details || data.error);
@@ -643,6 +645,7 @@ document.addEventListener('DOMContentLoaded', function() {
         localStorage.setItem('tamrini_exercise', lastExercise);
       }
     })
+      
     .catch(function(err) {
       console.error('API Error:', err);
       var t = translations[currentLang];
